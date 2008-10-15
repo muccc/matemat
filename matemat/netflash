@@ -1,0 +1,4 @@
+#!/bin/bash
+cp ethersex.bin /tftpboot
+echo "wdreset" | nc 10.0.0.17 2701
+

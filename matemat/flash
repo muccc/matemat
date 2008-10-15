@@ -1,0 +1,1 @@
+avrdude -p m644 -U flash:w:ethersex.hex

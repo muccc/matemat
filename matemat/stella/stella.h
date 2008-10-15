@@ -1,0 +1,59 @@
+
+
+enum stella_colors
+{
+  STELLA_COLOR_0,
+  STELLA_COLOR_1,
+  STELLA_COLOR_2,
+  STELLA_COLOR_3,
+  STELLA_COLOR_4,
+  STELLA_COLOR_5,
+  STELLA_COLOR_6,
+  STELLA_COLOR_7
+};
+
+enum stella_commands
+{
+  STELLA_SET_COLOR_0,
+  STELLA_SET_COLOR_1,
+  STELLA_SET_COLOR_2,
+  STELLA_SET_COLOR_3,
+  STELLA_SET_COLOR_4,
+  STELLA_SET_COLOR_5,
+  STELLA_SET_COLOR_6,
+  STELLA_SET_COLOR_7,
+  STELLA_FADE_COLOR_0,
+  STELLA_FADE_COLOR_1,
+  STELLA_FADE_COLOR_2,
+  STELLA_FADE_COLOR_3,
+  STELLA_FADE_COLOR_4,
+  STELLA_FADE_COLOR_5,
+  STELLA_FADE_COLOR_6,
+  STELLA_FADE_COLOR_7,
+  STELLA_FLASH_COLOR_0,
+  STELLA_FLASH_COLOR_1,
+  STELLA_FLASH_COLOR_2,
+  STELLA_FLASH_COLOR_3,
+  STELLA_FLASH_COLOR_4,
+  STELLA_FLASH_COLOR_5,
+  STELLA_FLASH_COLOR_6,
+  STELLA_FLASH_COLOR_7,
+  STELLA_SELECT_FADE_FUNC,
+};
+
+enum
+{
+  STELLA_FADE_NORMAL,
+  STELLA_FADE_FLASHY,
+  FADE_FUNC_LEN
+};
+
+extern uint8_t stella_color[];
+extern uint8_t stella_fade[];
+
+extern uint8_t stella_fade_func;
+
+void stella_pwm_init(void);
+void stella_sort(uint8_t color[]);
+void stella_timer(void);
+void stella_process(unsigned char *buf, uint8_t len);

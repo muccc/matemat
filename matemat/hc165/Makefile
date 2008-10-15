@@ -1,0 +1,17 @@
+TARGET = libhc165.a
+TOPDIR = ..
+SRC = \
+	hc165.c \
+
+##############################################################################
+# generic fluff
+include $(TOPDIR)/defaults.mk
+include $(TOPDIR)/rules.mk
+
+schematic.pdf: schematic.sch
+	sch2ps schematic.sch
+	ps2pdf schematic.ps
+	$(RM) -rf schematic.ps
+
+clean: clean-common
+	$(RM) -rf schematic.pdf gschem.log
