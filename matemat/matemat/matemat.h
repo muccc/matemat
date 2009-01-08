@@ -19,8 +19,8 @@
 #define GET_BOTTOM      (lm75_gettemp(BOTTOM_ADR))
 #define GET_MIDDLE      (lm75_gettemp(MIDDLE_ADR))
 
-#define TEMP_START_VAL    12
-#define TEMP_STOP_VAL    6
+#define TEMP_START_VAL    15
+#define TEMP_STOP_VAL    10
 
 #define temp(x) (x * 2)
 

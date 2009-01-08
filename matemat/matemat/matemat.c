@@ -3,6 +3,8 @@
 #include "lm75.h"
 #include "../lcd/hd44780.h"
 #include <avr/pgmspace.h>
+#include <avr/interrupt.h>
+#include <avr/io.h>
 #include <string.h>
 
 #ifdef MATEMAT_SUPPORT
@@ -46,7 +48,7 @@ void matemat_periodic(void)
 {
     static uint8_t t = 0;
     if(++t == 50){
-        kick = 1;
+    //    kick = 1;
         t = 0;
     }
 }
@@ -62,10 +64,14 @@ void matemat_setupdisp(void)
 
     hd44780_goto(3,0);
     fprintf_P(lcd, PSTR("Bottom: \n"));
+
+    hd44780_goto(1,17);
+    fprintf_P(lcd, PSTR("PL"));
 }
 
 void matemat_putmode(void)
 {
+    cli();
     hd44780_goto(1,10);
     switch(matemat_global.mode){
         case MODE_IDLE:
@@ -78,17 +84,23 @@ void matemat_putmode(void)
             fprintf_P(lcd, PSTR("?mode? "));
         break;
     }
+    sei();
 }
+
+
+volatile unsigned char pl = '-';
 
 void matemat_process(void)
 {
     static uint8_t state = 0;
     static uint8_t timer = 0;
     if(kick){
+        cli();
         matemat_global.temps[TEMP_BOTTOM] = GET_BOTTOM;
         printtemp(matemat_global.temps[TEMP_BOTTOM],3,8);
         matemat_global.temps[TEMP_MIDDLE] = GET_MIDDLE;
         printtemp(matemat_global.temps[TEMP_MIDDLE],2,8);
+        
         hd44780_goto(1,0);
         fprintf(lcd,"%d",matemat_global.matemat_packetcount);
         hd44780_goto(3,19);
@@ -96,6 +108,17 @@ void matemat_process(void)
             hd44780_put('.',NULL);
         else
             hd44780_put(' ',NULL);
+        sei();
+        
+        //hd44780_goto(1,19);
+        //hd44780_put(pl,NULL);
+
+        //if( (PINC & (1<<PC4)) )
+        //    hd44780_put('2',NULL);
+        //else if( (PINC & (1<<PC3)) )
+        //    hd44780_put('3',NULL);
+        //else
+        //    hd44780_put('-',NULL);
         state = !state;
 
         if(matemat_global.mode == MODE_IDLE){
@@ -121,6 +144,51 @@ void matemat_process(void)
    
 }
 
+ISR(TIMER0_OVF_vect , ISR_BLOCK)
+{
+    static unsigned int i;
+    static unsigned char j;
+    static unsigned int put = 0;
+
+    if(put && put++ > 2000){
+        put = 0;
+    }
+    if(i++ == 3588){
+        i = 0;
+        kick = 1;
+    }
+    if(PINC & (1<<PC4)){
+        //pl = '2';
+        j = 0;
+        if (pl != '1'){
+            pl = '1';
+            hd44780_goto(1,19);
+            hd44780_put(pl,NULL);
+            put = 1;
+        }
+        //PORTC |= (1<<PC5);
+    }
+    if(PINC & (1<<PC3)){
+        //pl = '2';
+        j = 0;
+        if (pl != '3'){
+            pl = '3';
+            hd44780_goto(1,19);
+            hd44780_put(pl,NULL);
+        }
+        //PORTC |= (1<<PC6);
+    }
+    if(pl != '-'){
+        if(j++ > 180){
+            PORTC &= ~(1<<PC5);
+            PORTC &= ~(1<<PC6);
+            pl = '-';
+            hd44780_goto(1,19);
+            hd44780_put(pl,NULL);
+        }
+    }
+}
+
 void matemat_init()
 {
     i2c_init();
@@ -128,9 +196,17 @@ void matemat_init()
     matemat_setupdisp();
     DDR_CONFIG_OUT(MATEMAT_COOLER);
     PIN_SET(MATEMAT_COOLER);
+    DDRC &= ~((1<<PC4)|(1<<PC3));
+    DDRC |= ((1<<PC5)|(1<<PC6));
+    PORTC |= (1<<PC4)|(1<<PC3);
+    PORTC &= ~((1<<PC5)|(1<<PC6));
+
     matemat_global.mode = MODE_COOLING;
     matemat_global.temps[TEMP_START] = temp(TEMP_START_VAL);
     matemat_global.temps[TEMP_STOP] = temp(TEMP_STOP_VAL);
+
+    TCCR0B = 1<<CS01;       //div by 8
+    TIMSK0 |= 1<<TOIE0;
 }
 
 #endif
