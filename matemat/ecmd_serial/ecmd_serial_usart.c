@@ -61,11 +61,11 @@ SIGNAL(usart(USART,_RX_vect))
     return; 
   }
   uint8_t data = usart(UDR);
-  if (data == '\r') return; /* We ignore '\r' */
+  if (data == '\n') return; /* We ignore '\r' */
 
   recv_buffer[recv_len++] = data;
 
-  if (data == '\n' || recv_len == sizeof(recv_buffer)) {
+  if (data == '\r' || recv_len == sizeof(recv_buffer)) {
     //PORTA ^= 0x80;
     /* we have a request */
     recv_buffer[recv_len - 1] = 0;
