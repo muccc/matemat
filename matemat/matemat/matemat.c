@@ -136,7 +136,7 @@ void matemat_process(void)
         }
 
         kick = 0;
-        if(timer++ == 1){
+        if(timer++ == 10){
             matemat_global.push = 1;
             timer = 0;
         }
@@ -195,13 +195,13 @@ void matemat_init()
     lm75_init();
     matemat_setupdisp();
     DDR_CONFIG_OUT(MATEMAT_COOLER);
-    PIN_SET(MATEMAT_COOLER);
+    PIN_CLEAR(MATEMAT_COOLER);
     DDRC &= ~((1<<PC4)|(1<<PC3));
     DDRC |= ((1<<PC5)|(1<<PC6));
     PORTC |= (1<<PC4)|(1<<PC3);
     PORTC &= ~((1<<PC5)|(1<<PC6));
 
-    matemat_global.mode = MODE_COOLING;
+    matemat_global.mode = MODE_IDLE;
     matemat_global.temps[TEMP_START] = temp(TEMP_START_VAL);
     matemat_global.temps[TEMP_STOP] = temp(TEMP_STOP_VAL);
 

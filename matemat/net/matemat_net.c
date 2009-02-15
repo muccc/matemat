@@ -30,7 +30,8 @@ matemat_net_main(void)
             matemat_global.matemat_packetcount++;
             sprintf(uip_appdata,"temp0=");
             sprintf_temp(uip_appdata+strlen(uip_appdata),matemat_global.temps[0],0);
-            sprintf(uip_appdata+strlen(uip_appdata),"\r\ntemp1=");
+//            sprintf(uip_appdata+strlen(uip_appdata),"\r\ntemp1=");
+            sprintf(uip_appdata+strlen(uip_appdata)," temp1=");
             sprintf_temp(uip_appdata+strlen(uip_appdata),matemat_global.temps[1],0);
             uip_udp_send(strlen(uip_appdata));
             //uip_slen = 5;

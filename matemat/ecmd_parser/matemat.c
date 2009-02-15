@@ -43,6 +43,10 @@ int16_t parse_cmd_matemat_gettemp(char *cmd, char *output, uint16_t len)
 
 int16_t parse_cmd_matemat_cooling(char *cmd, char *output, uint16_t len)
 /* {{{ */ {
+    if(cmd[1] == '1')
+        PIN_SET(MATEMAT_COOLER);
+    if(cmd[1] == '0')
+        PIN_CLEAR(MATEMAT_COOLER);
     return 0;
 } /* }}} */
 #endif /* RC5_SUPPORT */
