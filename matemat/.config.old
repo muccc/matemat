@@ -145,9 +145,9 @@ ONEWIRE_SUPPORT=y
 #
 # work in progress bits (enable with care)
 #
-# DATAFLASH_SUPPORT is not set
-# PSOCK_SUPPORT is not set
-# HTTPD_SUPPORT is not set
+DATAFLASH_SUPPORT=y
+PSOCK_SUPPORT=y
+HTTPD_SUPPORT=y
 # HTTPD_AUTH_SUPPORT is not set
 # CONTROL6_SUPPORT is not set
 # USB_SUPPORT is not set

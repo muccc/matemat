@@ -21,9 +21,9 @@
 #ifndef _ECMD_SERIAL_USART_H
 #define _ECMD_SERIAL_USART_H
 
-#define ECMD_SERIAL_USART_BUFFER_LEN 50
+#define ECMD_SERIAL_USART_BUFFER_LEN 23
 /* use 19200 baud at 20mhz (see datasheet for other values) */
-#define ECMD_SERIAL_USART_UBRR 64
+#define ECMD_SERIAL_USART_UBRR 3
 
 void ecmd_serial_usart_init(void);
 #endif

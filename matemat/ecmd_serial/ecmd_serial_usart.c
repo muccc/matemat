@@ -66,7 +66,7 @@ SIGNAL(usart(USART,_RX_vect))
   recv_buffer[recv_len++] = data;
 
   if (data == '\n' || recv_len == sizeof(recv_buffer)) {
-    PORTA ^= 0x80;
+    //PORTA ^= 0x80;
     /* we have a request */
     recv_buffer[recv_len - 1] = 0;
     if (recv_len == 1) return;
