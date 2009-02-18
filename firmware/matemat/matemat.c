@@ -9,8 +9,18 @@
 
 #ifdef MATEMAT_SUPPORT
 
+#define USE_USART 0
+#include "../usart.h"
+
+
 volatile uint8_t kick = 0;
 struct matemat_global matemat_global;
+
+generate_usart_init(MATEMAT_SERIAL_USART_UBRR)
+
+volatile unsigned int grant=0;
+uint8_t msg[30];
+uint8_t msgp = 0;
 
 void sprintf_temp(char * s, int16_t t, uint8_t pad)
 {
@@ -69,6 +79,14 @@ void matemat_setupdisp(void)
     fprintf_P(lcd, PSTR("PL"));
 }
 
+void matemat_putmsg(void)
+{
+    cli();
+    hd44780_goto(0,0);
+    fprintf(lcd,msg);
+    sei(); 
+}
+
 void matemat_putmode(void)
 {
     cli();
@@ -94,6 +112,7 @@ void matemat_process(void)
 {
     static uint8_t state = 0;
     static uint8_t timer = 0;
+
     if(kick){
         cli();
         matemat_global.temps[TEMP_BOTTOM] = GET_BOTTOM;
@@ -144,12 +163,28 @@ void matemat_process(void)
    
 }
 
+uint8_t setPL(uint8_t p)
+{
+    switch(p){
+        case '1':
+            PORTC |= (1<<PC5);
+            grant = 2000;
+            return 1;
+        break;
+        case '3':
+            PORTC |= (1<<PC6);
+            grant = 2000;
+            return 1;
+        break;
+    };
+    return 0;
+}
+
 ISR(TIMER0_OVF_vect , ISR_BLOCK)
 {
     static unsigned int i=0;
     static unsigned char count1=0;
     static unsigned char count3=0;
-    static unsigned char grant=0;
     if(i-- == 0){
         i = 3588;
         kick = 1;
@@ -163,8 +198,6 @@ ISR(TIMER0_OVF_vect , ISR_BLOCK)
             pl = '1';
             hd44780_goto(1,19);
             hd44780_put(pl,NULL);
-//            PORTC |= (1<<PC5);
-//            grant = 2000;
         }
     }else{
         count1=0;
@@ -175,8 +208,6 @@ ISR(TIMER0_OVF_vect , ISR_BLOCK)
             pl = '3';
             hd44780_goto(1,19);
             hd44780_put(pl,NULL);
-//            PORTC |= (1<<PC6);
-//            grant = 2000;
         }
     }else{
         count3=0;
@@ -191,6 +222,44 @@ ISR(TIMER0_OVF_vect , ISR_BLOCK)
     }
 }
 
+SIGNAL(usart(USART,_RX_vect))
+{
+  static uint8_t reported = '-';
+  static uint8_t print = 0;
+  /* Ignore errors */
+  if ((usart(UCSR,A) & _BV(usart(DOR))) || (usart(UCSR,A) & _BV(usart(FE)))) {
+    uint8_t v = usart(UDR);
+    (void) v;
+    return; 
+  }
+  uint8_t data = usart(UDR);
+  if(print){
+    if(data == '\r' || data == '\n' || data == 0){
+        print = 0;
+        matemat_putmsg();
+        usart(UDR) = 'D';
+    }else{
+        msg[msgp++]=data;
+        if(msgp == 20)
+            msgp--;
+    }
+    return;
+  }
+  if(data == 'V'){
+      usart(UDR) = pl;
+      reported = pl;
+  }else if(data == 'O'){
+      if(setPL(reported))
+        usart(UDR) = 'D';
+      else
+        usart(UDR) = 'N';
+  }else if(data == 'D'){
+    print=1;
+    msgp = 0;
+  }
+
+}
+
 void matemat_init()
 {
     DDR_CONFIG_OUT(MATEMAT_COOLER);
@@ -203,6 +272,8 @@ void matemat_init()
     i2c_init();
     lm75_init();
     matemat_setupdisp();
+    usart_init();
+  //  usart(UCSR,B) &= ~_BV(usart(RXCIE));
 
     matemat_global.mode = MODE_IDLE;
     matemat_global.temps[TEMP_START] = temp(TEMP_START_VAL);

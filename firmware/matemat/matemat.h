@@ -27,6 +27,10 @@
 #define MODE_COOLING    0
 #define MODE_IDLE       1
 
+#define MATEMAT_SERIAL_USART_BUFFER_LEN 23
+/* use 115200 baud at 7.xxmhz (see datasheet for other values) */
+#define MATEMAT_SERIAL_USART_UBRR 3
+
 extern struct matemat_global matemat_global;
 
 struct matemat_global {
