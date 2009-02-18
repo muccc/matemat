@@ -45,7 +45,7 @@ void ecmd_serial_usart_init(void) {
   recv_len = 0;
   /* Initialize the usart module */
   usart_init();
-  DDRA = 0xC0;
+//  DDRA = 0xC0;
 #ifdef ECMD_SERIAL_USART_RS485_SUPPORT
   DDR_CONFIG_OUT(ECMD_SERIAL_USART_TX);
   PIN_CLEAR(ECMD_SERIAL_USART_TX);

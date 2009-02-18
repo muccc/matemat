@@ -146,60 +146,63 @@ void matemat_process(void)
 
 ISR(TIMER0_OVF_vect , ISR_BLOCK)
 {
-    static unsigned int i;
-    static unsigned char j;
-    static unsigned int put = 0;
-
-    if(put && put++ > 2000){
-        put = 0;
-    }
-    if(i++ == 3588){
-        i = 0;
+    static unsigned int i=0;
+    static unsigned char count1=0;
+    static unsigned char count3=0;
+    static unsigned char grant=0;
+    if(i-- == 0){
+        i = 3588;
         kick = 1;
     }
+
+    if(grant)
+        grant--;
+
     if(PINC & (1<<PC4)){
-        //pl = '2';
-        j = 0;
-        if (pl != '1'){
+        if(pl == '-' && count1++ == 70){
             pl = '1';
             hd44780_goto(1,19);
             hd44780_put(pl,NULL);
-            put = 1;
+//            PORTC |= (1<<PC5);
+//            grant = 2000;
         }
-        //PORTC |= (1<<PC5);
+    }else{
+        count1=0;
     }
+
     if(PINC & (1<<PC3)){
-        //pl = '2';
-        j = 0;
-        if (pl != '3'){
+        if(pl == '-' && count3++==70){
             pl = '3';
             hd44780_goto(1,19);
             hd44780_put(pl,NULL);
+//            PORTC |= (1<<PC6);
+//            grant = 2000;
         }
-        //PORTC |= (1<<PC6);
+    }else{
+        count3=0;
     }
-    if(pl != '-'){
-        if(j++ > 180){
-            PORTC &= ~(1<<PC5);
-            PORTC &= ~(1<<PC6);
-            pl = '-';
-            hd44780_goto(1,19);
-            hd44780_put(pl,NULL);
-        }
+
+    if(!grant && count3==0 && count1==0 && pl != '-'){
+        PORTC &= ~(1<<PC5);
+        PORTC &= ~(1<<PC6);
+        pl = '-';
+        hd44780_goto(1,19);
+        hd44780_put(pl,NULL);
     }
 }
 
 void matemat_init()
 {
-    i2c_init();
-    lm75_init();
-    matemat_setupdisp();
     DDR_CONFIG_OUT(MATEMAT_COOLER);
     PIN_CLEAR(MATEMAT_COOLER);
     DDRC &= ~((1<<PC4)|(1<<PC3));
     DDRC |= ((1<<PC5)|(1<<PC6));
     PORTC |= (1<<PC4)|(1<<PC3);
     PORTC &= ~((1<<PC5)|(1<<PC6));
+
+    i2c_init();
+    lm75_init();
+    matemat_setupdisp();
 
     matemat_global.mode = MODE_IDLE;
     matemat_global.temps[TEMP_START] = temp(TEMP_START_VAL);
