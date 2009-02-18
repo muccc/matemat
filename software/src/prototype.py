@@ -25,8 +25,6 @@ def lcdmsg(val):
 serdev = "/dev/ttyS0"
 serial = serial.Serial(serdev, 115200)
 
-lcdmsg("foo")
-
 purse = open("/mnt/token/purse", "r")
 pursedata = purse.readlines()
 
