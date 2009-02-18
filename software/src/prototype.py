@@ -14,9 +14,6 @@ import time
 import sys
 
 def lcdmsg(val):
-        lcdmsg = "D                   \n"
-        serial.write(lcdmsg)
-        serial.read(1)
         lcdmsg = "D%s\n" % val
         print lcdmsg
         serial.write(lcdmsg)
