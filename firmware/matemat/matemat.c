@@ -236,6 +236,7 @@ SIGNAL(usart(USART,_RX_vect))
   if(print){
     if(data == '\r' || data == '\n' || data == 0){
         print = 0;
+        msg[20] = 0;
         matemat_putmsg();
         usart(UDR) = 'D';
     }else{
@@ -254,6 +255,8 @@ SIGNAL(usart(USART,_RX_vect))
       else
         usart(UDR) = 'N';
   }else if(data == 'D'){
+    for(print=0;print<20;print++)
+        msg[print] = ' ';
     print=1;
     msgp = 0;
   }
