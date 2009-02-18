@@ -13,6 +13,7 @@ import serial
 import time
 import sys
 
+debug = True
 
 ###
 ## msg2lcd(message): Send a message to the matemat LCD.
@@ -21,24 +22,26 @@ import sys
 def msg2lcd(val):
 	lcdmsg = "D%s\n" % val
 	serial.write(lcdmsg)
-	debug && print "LCD-Message: %s" % val
+	if debug: print "LCD-Message: %s" % val
 
 def readPurse():
-	purse = open("/mnt/token/purse", "r")
+	purse = open("purse", "r")
 	pursedata = purse.readlines()
 
 	tokencount = 0
 	for token in pursedata:
 		tokencount = tokencount+1
 
-	debug && print "Token Count: %s" % tokencount
+	if debug: print "Token Count: %s" % tokencount
 	return tokencount
 
 def talkSerial(send, expect):
 	serial.write(send)
 	reply = serial.read(1)
-	debug && print "talkSerial() reply: %s" % reply
+	if debug: print "talkSerial() reply: %s" % reply
 	if reply == expect:
-		return TRUE
-	else
-		return FALSE
+		return True
+	else:
+		return False
+
+readPurse()
