@@ -16,10 +16,11 @@ import sys
 def lcdmsg(val):
         lcdmsg = "D                   \n"
         serial.write(lcdmsg)
-        time.sleep(0.1)
+        serial.read(1)
         lcdmsg = "D%s\n" % val
         print lcdmsg
         serial.write(lcdmsg)
+        serial.read(1)
 
 serdev = "/dev/ttyS0"
 serial = serial.Serial(serdev, 115200)
@@ -36,7 +37,6 @@ for line in pursedata:
 lcdmsg("Token Count: %s" % tokencount)
 
 while 1:
-        time.sleep(0.1)
         serial.write("V")
         mmstate = serial.read(1)
         print mmstate
