@@ -25,8 +25,12 @@ debug = True
 serial = serial.Serial("/dev/ttyS0",115200)
 def msg2lcd(val):
     lcdmsg = "D%s\n" % val
-    serial.write(lcdmsg)
     if debug: print "LCD-Message: %s" % val
+    serial.write(lcdmsg)
+    ret = ''
+    while ret != 'D':
+        ret = serial.read(1)
+        if debug: print "Lcd return="+ret
 
 def readPurse():
 	purse = open("/tmp/usb/purse", "r")
@@ -47,6 +51,13 @@ def talkSerial(send, expect):
 		return True
 	else:
 		return False
+def getPriceline():
+    serial.write('V')
+    reply = serial.read(1)
+    if reply == '-':
+        return -1
+    return int(reply)
+
 
 type = ""
 path = ""
@@ -81,11 +92,23 @@ if ret != 0:
     sys.exit(2)
 log.write("mount successful\n")
 
-#try:
-t = readPurse()
-msg2lcd("tokens: "+str(t))
-#except:
-#    log.write("read purse failed\n")
+try:
+    t = readPurse()
+    msg2lcd("tokens: "+str(t))
+    pl = -1
+    while pl == -1:
+        pl = getPriceline()
+    if pl == 1:
+        price = 3
+    else:
+        price = 2
+
+    ret = talkSerial('O','D')
+    msg2lcd("serving "+str(price)+" tokens")
+    time.sleep(5)
+    msg2lcd("goodbye")
+except:
+    log.write("unexpected error\n")
 
 log.write("trying to unmount..")
 ret = os.system("umount /tmp/usb")
