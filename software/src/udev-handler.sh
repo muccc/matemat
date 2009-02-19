@@ -11,15 +11,15 @@
 
 start(){
 	echo "START" | nc -w 1 -u localhost 4444
-	mount $UPATH /mnt/token/ && echo MOUNT | nc -w 1 -u localhost 4444
+	mount /mnt/token/ && echo MOUNT | nc -w 1 -u localhost 4444
 	return $?
 }
 
 stop(){
-	umount $UPATH && echo "DONE" | nc -w 1 -u localhost 4444
+	umount /mnt/token && echo "DONE" | nc -w 1 -u localhost 4444
 	return $?
 }
 
 $1
 
-exit &?
+exit $?
