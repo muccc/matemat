@@ -1,1 +1,1 @@
-KERNEL=="sd*", SUBSYSTEMS=="scsi",RUN+="/tmp/matemat"
+KERNEL=="sd*", SUBSYSTEMS=="scsi",RUN+="/usr/local/bin/udev-handler.sh start"
