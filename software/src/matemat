@@ -9,9 +9,10 @@ log.write(time.ctime() + "   udev event\n")
 log.write("$ACTION="+os.environ["ACTION"]+"\n")
 log.write("$DEVNAME="+os.environ["DEVNAME"]+"\n")
 
-log.write("forking\n")
+#log.write("forking\n")
 log.close()
-ret = os.fork()
+#ret = os.fork()
+ret = 0
 if ret == 0:
     log = open("/tmp/matemat.log","a")
     options = "--type=disk --path="+os.environ["DEVNAME"]
