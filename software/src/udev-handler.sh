@@ -9,19 +9,17 @@
 # ----------------------------------------------------------------------------
 #
 
-UTYPE=$1
-UPATH=$2
+start(){
+	echo "START" | nc -w 1 -u localhost 4444
+	mount $UPATH /mnt/token/ && echo MOUNT | nc -w 1 -u localhost 4444
+	return $?
+}
 
-if [ ! $UTYPE == "disk" ];
-then
-	echo "UNSUPPORTED" | nc -u localhost 4444
-	exit 1
-fi
+stop(){
+	umount $UPATH && echo "DONE" | nc -w 1 -u localhost 4444
+	return $?
+}
 
-/usr/local/bin/lcdreport.py -t "Starting"
-
-mount $UPATH /mnt/token/ && echo $UPATH | nc -u localhost 4444
-umount $UPATH && echo "DONE" | nc -u localhost 4444
-
+$1
 
 exit &?
