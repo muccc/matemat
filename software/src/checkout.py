@@ -81,11 +81,12 @@ while 1:
 		if verifyCredit(token, priceline):
 			ret = talkSerial('O', 'D')
 			if ret:
-				os.system("/usr/local/bin/udev-handler.sh stop")
 				msg2lcd("Enjoy it")
+				os.system("/usr/local/bin/udev-handler.sh stop")
 				if debug: print "Enjoy it"
 		else
 			msg2lcd("Not enough credits")
+			os.system("/usr/local/bin/udev-handler.sh stop")
 			if debug: print "Not enough credits"
 		break
 	elif data == 'DONE':
