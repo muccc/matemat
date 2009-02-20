@@ -1,0 +1,8 @@
+#!/bin/bash
+make
+avr-objcopy -O binary -R .eeprom matemat.elf matemat.bin
+cp matemat.bin /tftpboot/ethersex.bin
+ssh root@schankwart "echo "\\0r\\1" > /dev/ttyS0"
+echo "wdreset" | nc 10.0.0.17 2701
+
+
