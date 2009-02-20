@@ -25,7 +25,7 @@ class Matemat:
         while True:
             msg = self.interface.readMessage()
             if msg == False:
-                return False
+                return -1
             if msg[0] == 'p':
                 return int(msg[2])
     def serve(self,priceline):
@@ -35,15 +35,16 @@ class Matemat:
             return False
         if ret == "sN":
             return False
+        return True
     def completeserve(self):
         return self.waitForReply(["sD"])
 
-m = Matemat()
-m.writeLCD("luvv")
-while m.getPriceline() != 3:
-    time.sleep(0.2)
-m.serve(3)
-m.completeserve()
+#m = Matemat()
+#m.writeLCD("luvv")
+#while m.getPriceline() != 3:
+#    time.sleep(0.2)
+#m.serve(3)
+#m.completeserve()
 
 
 
