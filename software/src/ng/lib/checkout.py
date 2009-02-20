@@ -11,18 +11,20 @@
 import socket
 import sys
 import token
+import matemat
 
 class Checkout:
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.bind(('127.0.0.1', 4444))
         self.token = token.Token()
+        self.matemat = matemat.Matemat()
 
     def listen(self):
         while True:
+            self.matemat.writeLCD("OBEY AND CONSUME")
             data, self.raddr = self.socket.recvfrom(64)
             data = data.strip()
-            print "Received: %s" % data
             self.interpret(data)
 
     def send(self, msg):
@@ -50,14 +52,24 @@ class Checkout:
                 self.send("FAIL")
                 return False
         elif cmd == "Td":
-            if self.token.eot(tokendata):
-                self.send("OK")
+            credit = self.token.eot()
+            self.matemat.writeLCD("Credit: %s" % credit)
+            
+            priceline = 0
+            while priceline == 0:
+                priceline = self.matemat.getPriceline()
+
+            liquidity = self.token.assets(priceline)
+
+            if !liquidity: self.matemat.writeLCD("Not enough credits")
+
+            if self.matemat.serve(priceline):
+                self.matemat.writeLCD("Enjoy it")
+                self.matemat.completeserve()
                 return True
             else:
-                self.send("FAIL")
+                self.matemat.writeLCD("Failed to serve")
                 return False
-        else:
-            return False
 
 # "Testing"
 if __name__ == '__main__':

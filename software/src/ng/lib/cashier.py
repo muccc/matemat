@@ -25,7 +25,6 @@ class Cashier:
     def recv(self, expect):
          data = self.socket.recv(64)
          data = data.strip()
-         print "Received: %s" % data
          if data == expect:
              return True
          else:
@@ -54,4 +53,7 @@ class Cashier:
 if __name__ == '__main__':
     cashier = Cashier()
     ret = cashier.checkToken("12345678")
-    print "ret=%s" % ret
+    ret = cashier.checkToken("12345678")
+    ret = cashier.checkToken("12345678")
+    ret = cashier.checkToken("12345678")
+    ret = cashier.checkCredit()
