@@ -8,8 +8,6 @@
 # this stuff is worth it, you can buy me a mate in return.
 # ----------------------------------------------------------------------------
 
-
-#import serial
 import socket
 import time
 import os
@@ -17,8 +15,8 @@ import matemat
 
 socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 socket.bind(('127.0.0.1', 4444))
+
 debug = True
-#serial = serial.Serial('/dev/ttyS0', 115200)
 mate = matemat.Matemat()
 
 def readPurse():
