@@ -46,8 +46,8 @@ inline void priceline_interrupt(void)
     }
 
     if(!priceline.grant && count3==0 && count1==0 && priceline.pl != 0){
-        //PORTC &= ~(1<<PC5);
-        //PORTC &= ~(1<<PC6);
+        PIN_CLEAR(SERVELINE1);
+        PIN_CLEAR(SERVELINE3);
         priceline.pl = 0;
         plfromint = 1;
     }

@@ -49,7 +49,7 @@ void cmd(uint8_t * cmd, uint8_t len)
 {
     uint8_t ret;
     char buffer[20];
-    debug(2,"cmd");
+//    debug(2,"cmd");
     switch(cmd[0]){
         case 'r':
             debug(1,"jumping to bootloader");
