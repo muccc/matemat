@@ -90,7 +90,7 @@ void priceline_tick(void)
             plfromint = 0;
         }
         if(priceline.grant){
-            priceline.grant-=5;
+            priceline.grant-=50;
             if(priceline.grant == 0){
                 matemat_served();
             }
