@@ -1,4 +1,4 @@
 #KERNEL=="sd*", SUBSYSTEMS=="block",RUN+="/usr/local/bin/udev-handler.sh start"
 KERNEL=="sd*", SUBSYSTEMS=="block",RUN+="/tmp/matemat"
 KERNEL=="sd*", SUBSYSTEMS=="block", ACTION=="add", RUN+="/usr/local/bin/readvolume"
-KERNEL=="sd*", SUBSYSTEMS=="block", ACTION=="remove", RUN+="/usr/local/bin/readvolume"
+KERNEL=="sd*", SUBSYSTEMS=="block", ACTION=="remove", RUN+="/usr/local/bin/abort"
