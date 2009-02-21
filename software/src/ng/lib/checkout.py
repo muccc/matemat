@@ -13,6 +13,7 @@ import sys
 import time
 import token
 import matemat
+import logger
 
 class Checkout:
     def __init__(self):
@@ -20,16 +21,23 @@ class Checkout:
         self.socket.bind(('127.0.0.1', 4444))
         self.token = token.Token()
         self.matemat = matemat.Matemat()
+        self.log = logger.Logger('Checkout')
+        self.log.debug('__init__(): invoked')
 
     def listen(self):
+        self.log.debug('listen(): invoked')
         self.matemat.writeLCD("OBEY AND CONSUME")
+        self.log.info('listen(): Waiting for clients')
         while True:
             data, self.raddr = self.socket.recvfrom(64)
             data = data.strip()
+            self.log.info('listen(): data=%s' % data)
             self.interpret(data)
 
     def send(self, msg):
-        print "sending",msg
+        self.log.debug('send(): invoked')
+        self.log.info('send(): msg=%s' % msg)
+        # print "sending",msg
         sent = self.socket.sendto(msg, self.raddr)
         if sent == 0:
             return False
@@ -37,11 +45,15 @@ class Checkout:
             return True
 
     def interpret(self, data):
-        print "interpret:", data
+        self.log.debug('interpret(): invoked')
+        self.log.info('interpret(): data=%s' % data)
+        # print "interpret:", data
         cmd = "%s%s" % (data[0], data[1])
-        print "cmd:",cmd
+        self.log.info('interpret(): cmd=%s' % cmd)
+        # print "cmd:",cmd
         tokendata = data.lstrip("Tacd")
-        print "tokendata:",tokendata
+        self.log.info('interpret(): tokendata=%s' % tokendata)
+        # print "tokendata:",tokendata
 
         if cmd == "Ta":
             if self.token.add(tokendata):
@@ -62,13 +74,16 @@ class Checkout:
                 return False
         elif cmd == "Td":
             credit = self.token.eot()
+            self.log.info('interpret(): credit=%s' % credit)
             self.matemat.writeLCD("Credit: %s" % credit)
             
             priceline = 0
             while priceline == 0:
                 priceline = self.matemat.getPriceline()
+                self.log.info('interpret(): priceline=%s' % priceline)
                 #time.sleep(1)
-            print "checking liquidity"
+
+            # print "checking liquidity"
 
             liquidity = self.token.assets(priceline)
 
@@ -79,12 +94,14 @@ class Checkout:
                 return False
 
             if self.matemat.serve(priceline):
+                self.log.info('interpret(): Serving %s' % priceline)
                 self.matemat.writeLCD("Enjoy it")
                 self.matemat.completeserve()
                 self.token.finish(priceline)
                 self.send("OK")
                 return True
             else:
+                self.log.info('interpret(): Failed to serve %s' % priceline)
                 self.matemat.writeLCD("Failed to serve")
                 self.send("FAIL")
                 return False
