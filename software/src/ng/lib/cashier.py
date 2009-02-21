@@ -14,6 +14,7 @@ class Cashier:
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.connect(('127.0.0.1', 4444))
+        self.socket.settimeout(1)
 
     def send(self, msg):
         sent = self.socket.send(msg)
@@ -23,12 +24,31 @@ class Cashier:
             return True
 
     def recv(self, expect):
-         data = self.socket.recv(64)
-         data = data.strip()
-         if data == expect:
-             return True
-         else:
-             return False
+        try:
+            data = self.socket.recv(64)
+        except:
+            return False
+        data = data.strip()
+        if data == expect:
+            return True
+        else:
+            return False
+
+    def isReady(self):
+        sent = self.send("Rd")
+        if sent: rcvd = self.recv("READY")
+        else: return False
+                        
+        if rcvd: return True
+        else: return False
+
+    def abort(self):
+        sent = self.send("Ab")
+        if sent: rcvd = self.recv("OK")
+        else: return False
+                        
+        if rcvd: return True
+        else: return False
 
     def checkToken(self, token):
         sent = self.send("Tc%s" % token)
@@ -42,11 +62,11 @@ class Cashier:
     def checkCredit(self):
         sent = self.send("Td")
 
-        if sent: rcvd = self.recv("OK")
-        else: return False
+#        if sent: rcvd = self.recv("OK")
+#        else: return False
 
-        if rcvd: return True
-        else: return False
+#        if rcvd: return True
+#        else: return False
 
 # "Testing"
 
