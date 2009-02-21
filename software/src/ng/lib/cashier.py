@@ -21,7 +21,7 @@ class Cashier:
 
     def send(self, msg):
         self.log.debug('send(): invoked')
-        self.log.info('send(): msg=%s' % msg)
+        self.log.log('send(): msg=%s' % msg)
 
         sent = self.socket.send(msg)
         if sent == 0:
@@ -31,7 +31,7 @@ class Cashier:
 
     def recv(self, expect):
         self.log.debug('recv(): invoked')
-        self.log.info('recv(): expect=%s' % expect)
+        self.log.log('recv(): expect=%s' % expect)
         try:
             data = self.socket.recv(64)
         except:
@@ -62,7 +62,7 @@ class Cashier:
 
     def checkToken(self, token):
         self.log.debug('checkToken(): invoked')
-        self.log.info('checkTokeN(): token=%s' % s)
+        self.log.log('checkTokeN(): token=%s' % s)
         sent = self.send("Tc%s" % token)
 
         if sent: rcvd = self.recv("OK")

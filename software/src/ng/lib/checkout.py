@@ -27,16 +27,16 @@ class Checkout:
     def listen(self):
         self.log.debug('listen(): invoked')
         self.matemat.writeLCD("OBEY AND CONSUME")
-        self.log.info('listen(): Waiting for clients')
+        self.log.log('listen(): Waiting for clients')
         while True:
             data, self.raddr = self.socket.recvfrom(64)
             data = data.strip()
-            self.log.info('listen(): data=%s' % data)
+            self.log.log('listen(): data=%s' % data)
             self.interpret(data)
 
     def send(self, msg):
         self.log.debug('send(): invoked')
-        self.log.info('send(): msg=%s' % msg)
+        self.log.log('send(): msg=%s' % msg)
         # print "sending",msg
         sent = self.socket.sendto(msg, self.raddr)
         if sent == 0:
@@ -46,13 +46,13 @@ class Checkout:
 
     def interpret(self, data):
         self.log.debug('interpret(): invoked')
-        self.log.info('interpret(): data=%s' % data)
+        self.log.log('interpret(): data=%s' % data)
         # print "interpret:", data
         cmd = "%s%s" % (data[0], data[1])
-        self.log.info('interpret(): cmd=%s' % cmd)
+        self.log.log('interpret(): cmd=%s' % cmd)
         # print "cmd:",cmd
         tokendata = data.lstrip("Tacd")
-        self.log.info('interpret(): tokendata=%s' % tokendata)
+        self.log.log('interpret(): tokendata=%s' % tokendata)
         # print "tokendata:",tokendata
 
         if cmd == "Ta":
@@ -74,13 +74,13 @@ class Checkout:
                 return False
         elif cmd == "Td":
             credit = self.token.eot()
-            self.log.info('interpret(): credit=%s' % credit)
+            self.log.log('interpret(): credit=%s' % credit)
             self.matemat.writeLCD("Credit: %s" % credit)
             
             priceline = 0
             while priceline == 0:
                 priceline = self.matemat.getPriceline()
-                self.log.info('interpret(): priceline=%s' % priceline)
+                self.log.log('interpret(): priceline=%s' % priceline)
                 #time.sleep(1)
 
             # print "checking liquidity"
@@ -94,14 +94,14 @@ class Checkout:
                 return False
 
             if self.matemat.serve(priceline):
-                self.log.info('interpret(): Serving %s' % priceline)
+                self.log.log('interpret(): Serving %s' % priceline)
                 self.matemat.writeLCD("Enjoy it")
                 self.matemat.completeserve()
                 self.token.finish(priceline)
                 self.send("OK")
                 return True
             else:
-                self.log.info('interpret(): Failed to serve %s' % priceline)
+                self.log.log('interpret(): Failed to serve %s' % priceline)
                 self.matemat.writeLCD("Failed to serve")
                 self.send("FAIL")
                 return False
