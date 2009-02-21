@@ -9,14 +9,20 @@
 # ----------------------------------------------------------------------------
 
 import socket
+import logger
 
 class Cashier:
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.connect(('127.0.0.1', 4444))
         self.socket.settimeout(1)
+        self.log = logger.Logger('Cashier')
+        self.log.debug('__init__(): invoked')
 
     def send(self, msg):
+        self.log.debug('send(): invoked')
+        self.log.info('send(): msg=%s' % msg)
+
         sent = self.socket.send(msg)
         if sent == 0:
             return False
@@ -24,6 +30,8 @@ class Cashier:
             return True
 
     def recv(self, expect):
+        self.log.debug('recv(): invoked')
+        self.log.info('recv(): expect=%s' % expect)
         try:
             data = self.socket.recv(64)
         except:
@@ -35,6 +43,7 @@ class Cashier:
             return False
 
     def isReady(self):
+        self.log.debug('isReady(): invoked')
         sent = self.send("Rd")
         if sent: rcvd = self.recv("READY")
         else: return False
@@ -43,6 +52,7 @@ class Cashier:
         else: return False
 
     def abort(self):
+        self.log.debug('abort(): invoked')
         sent = self.send("Ab")
         if sent: rcvd = self.recv("OK")
         else: return False
@@ -51,6 +61,8 @@ class Cashier:
         else: return False
 
     def checkToken(self, token):
+        self.log.debug('checkToken(): invoked')
+        self.log.info('checkTokeN(): token=%s' % s)
         sent = self.send("Tc%s" % token)
 
         if sent: rcvd = self.recv("OK")
@@ -60,6 +72,7 @@ class Cashier:
         else: return False
 
     def checkCredit(self):
+        self.log.debug('checkCredit(): invoked')
         sent = self.send("Td")
 
 #        if sent: rcvd = self.recv("OK")
