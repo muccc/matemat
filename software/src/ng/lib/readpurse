@@ -1,0 +1,25 @@
+#!/usr/bin/python
+
+# $Id$
+# ----------------------------------------------------------------------------
+# "THE MATE-WARE LICENSE"
+# codec <codec@muc.ccc.de> wrote this file. As long as you retain this notice you
+# can do whatever you want with this stuff. If we meet some day, and you think
+# this stuff is worth it, you can buy me a mate in return.
+# ----------------------------------------------------------------------------
+
+import cashier
+import sys
+
+cashier = cashier.Cashier()
+if cashier.isReady():
+    purse = open(sys.argv[1], 'r')
+    purselines = purse.readlines()
+    print "tokens in purse:",len(purselines)
+    for token in purselines:
+        cashier.checkToken(token)
+    cashier.checkCredit()
+else:
+    print "cashier is busy"
+
+sys.exit(0)
