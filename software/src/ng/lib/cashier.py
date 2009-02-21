@@ -62,7 +62,7 @@ class Cashier:
 
     def checkToken(self, token):
         self.log.debug('checkToken(): invoked')
-        self.log.log('checkTokeN(): token=%s' % s)
+        self.log.log('checkToken(): token=%s' % token)
         sent = self.send("Tc%s" % token)
 
         if sent: rcvd = self.recv("OK")
