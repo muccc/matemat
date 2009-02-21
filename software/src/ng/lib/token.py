@@ -10,10 +10,15 @@
 
 # TODO: Add SQL (;
 
+import sqlite3
+
 class Token:
     def __init__(self):
         self.tokencount = 0
         self.tokenreset = False
+        self.db = sqlite3.connect('token.db')
+        self.db_cur = self.db.cursor()
+        self.tokenlist = []
 
     def add(self, token):
         return True 
@@ -23,21 +28,47 @@ class Token:
             self.tokenreset = False
             self.tokencount = 0 
 
-        self.tokencount = self.tokencount+1 
-        return True
-
-    def eot(self):
-        if self.tokencount > 3:
-            self.tokenreset = True
-            return self.tokencount
+        if self.db_cur.execute('SELECT hash FROM tokens WHERE used=0 AND hash=%s' % token).fetchone():
+            self.tokencount = self.tokencount+1
+            self.tokenlist.append(token)
+            return True
         else:
             return False
 
+    def eot(self):
+        self.tokenreset = True
+        return self.tokencount
+            
     def assets(self, priceline):
-        # TODO: Get price for PL and check credit (tokencount)
+        cost = 0
+        self.db_cur.execute('SELECT * FROM pricelines')
+        price = self.db_cur.fetchone()
+        while price:
+            if price[1] == priceline:
+                cost = price[0]
+                break
+            else:
+                price = self.db_cur.fetchone()
+                cost = 2342
+
+        if (self.tokencount*0.5) >= cost:
+            return True
+        else:
+            return False
+
+    def finish(self):
+         for token in self.tokenlist:
+             print token
+             self.db.execute('UPDATE tokens SET used=1 WHERE hash=%s' % token)
+         
+         self.db.commit()
+         return True
 
 if __name__ == '__main__':
     token = Token()
-    token.add("foo")
-    token.check("foo")
-    token.eot("foo")
+    token.check("123")
+    crd = token.eot()
+    print crd
+    ret = token.assets('1')
+    print ret
+    token.finish()

@@ -66,6 +66,7 @@ class Checkout:
             if self.matemat.serve(priceline):
                 self.matemat.writeLCD("Enjoy it")
                 self.matemat.completeserve()
+                self.token.finish()
                 return True
             else:
                 self.matemat.writeLCD("Failed to serve")
