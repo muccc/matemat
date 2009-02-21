@@ -12,6 +12,7 @@
 
 import sqlite3
 import hashlib
+import logger
 
 class Token:
     def __init__(self):
@@ -22,16 +23,24 @@ class Token:
         self.db_cur = self.db.cursor()
         self.tokenlist = []
         self.hashlib = hashlib.sha512()
+        self.log = logger.Logger('Token')
+        self.log.debug('__init__(): invoked')
 
     def add(self, token):
         return True 
     
     def hash(self, token):
+        self.log.debug('hash(): invoked')
+        self.log.log('hash(): token=%s' % token)
         self.hashlib.update(token)
+        self.log.log('hash(): return=%s' % self.hashlib.hexdigest())
         return self.hashlib.hexdigest()
 
     def check(self, token):
+        self.log.debug('check(): invoked')
         if self.tokenreset:
+            self.log.log('check(): Resetting in-memory token data')
+
             self.tokenreset = False
             self.tokencount = 0
             self.tokenlist = []
@@ -40,42 +49,53 @@ class Token:
 
         self.db_cur.execute('SELECT hash FROM tokens WHERE used=0 AND hash=? LIMIT 1', (hashtoken,))
         if self.db_cur.fetchone():
-            print "FOUND UNUSED TOKEN: %s" % token
+            self.log.log('check(): %s is unused' % token)
+            # print "FOUND UNUSED TOKEN: %s" % token
             self.tokencount = self.tokencount+1
             self.tokenlist.append(token)
             return True
         else:
+            self.log.log('check(): %s is used' % token)
             return False
 
     def eot(self):
+        self.log.debug('eot(): invoked')
+        self.log.log('eot(): Number of valid tokens: %s' % self.tokencount)
         return self.tokencount
             
     def assets(self, priceline):
+        self.log.debug('assets(): invoked')
         self.cost = 0
-        print "translating priceline"
+        #print "translating priceline"
         self.db_cur.execute('SELECT price FROM pricelines WHERE priceline=?', (priceline,))
-        print "executed query"
+        #print "executed query"
         price = self.db_cur.fetchone()
-        print "price=",price
+        #print "price=",price
+        self.log.log('assets(): price=%s' % price)
         #while price[0] != priceline:
         #price = self.db_cur.fetchone()
         #    print "new price=",price
         
         #self.cost = int(price[0])
         self.cost = int(price[0])
-        print "COST: %s" % self.cost
+        self.log.log('assets(): cost=%s' % self.cost)
+        #print "COST: %s" % self.cost
         if self.tokencount >= self.cost:
+            self.log.log('assets(): Liquidity is given')
             return True
         else:
+            self.log.log('assets(): Liquidity is not given')
             return False
 
     def finish(self, priceline):
+        self.log.debug('finish(): invoked')
         rejected = 0
         if self.cost != 2342:
             for token in self.tokenlist:
                 if rejected < self.cost:
+                    self.log.log('finish(): Rejecting %s' % token)
                     hashtoken = self.hash(token)
-                    print "REJECT TOKEN: %s (%s)" % (token, rejected)
+                    # print "REJECT TOKEN: %s (%s)" % (token, rejected)
                     self.db.execute('UPDATE tokens SET used=1 WHERE hash=?', (hashtoken,))
                     rejected = rejected+1
          
@@ -85,15 +105,7 @@ class Token:
 
 if __name__ == '__main__':
     token = Token()
-    print "-- Check --"
-    token.check("dtkzoxcfxf")
-    token.check("pqvszoxmwe")
-    token.check("bwlfszyxqw")
-    print "-- EOT --"
+    token.check("frnzjbcns")
     crd = token.eot()
-    print crd
-    print "-- Assets --"
     ret = token.assets('1')
-    print ret
-    print "-- Finish --"
     token.finish(1)
