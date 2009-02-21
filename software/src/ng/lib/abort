@@ -12,5 +12,5 @@ import cashier
 import sys
 
 cashier = cashier.Cashier()
-cashier.abort():
+cashier.abort()
 sys.exit(0)
