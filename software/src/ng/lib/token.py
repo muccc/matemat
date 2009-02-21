@@ -11,6 +11,7 @@
 # TODO: Add SQL (;
 
 import sqlite3
+import hashlib
 
 class Token:
     def __init__(self):
@@ -20,18 +21,24 @@ class Token:
         self.db = sqlite3.connect('token.db')
         self.db_cur = self.db.cursor()
         self.tokenlist = []
+        self.hashlib = hashlib.sha512()
 
     def add(self, token):
         return True 
     
+    def hash(self, token):
+        self.hashlib.update(token)
+        return self.hashlib.hexdigest()
+
     def check(self, token):
-        print token
         if self.tokenreset:
             self.tokenreset = False
             self.tokencount = 0
             self.tokenlist = []
         
-        self.db_cur.execute('SELECT hash FROM tokens WHERE used=0 AND hash=? LIMIT 1', (token,))
+        hashtoken = self.hash(token)
+
+        self.db_cur.execute('SELECT hash FROM tokens WHERE used=0 AND hash=? LIMIT 1', (hashtoken,))
         if self.db_cur.fetchone():
             print "FOUND UNUSED TOKEN: %s" % token
             self.tokencount = self.tokencount+1
@@ -67,8 +74,9 @@ class Token:
         if self.cost != 2342:
             for token in self.tokenlist:
                 if rejected < self.cost:
+                    hashtoken = self.hash(token)
                     print "REJECT TOKEN: %s (%s)" % (token, rejected)
-                    self.db.execute('UPDATE tokens SET used=1 WHERE hash=?', (token,))
+                    self.db.execute('UPDATE tokens SET used=1 WHERE hash=?', (hashtoken,))
                     rejected = rejected+1
          
         self.db.commit()
