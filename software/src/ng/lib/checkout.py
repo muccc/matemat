@@ -50,6 +50,9 @@ class Checkout:
             else:
                 self.send("FAIL")
                 return False
+        elif cmd == "Rd":
+            self.send("READY")
+            return True
         elif cmd == "Tc":
             if self.token.check(tokendata):
                 self.send("OK")
