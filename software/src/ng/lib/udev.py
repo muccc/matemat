@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/python
 
 # $Id$
 # ----------------------------------------------------------------------------
@@ -7,19 +7,18 @@
 # can do whatever you want with this stuff. If we meet some day, and you think
 # this stuff is worth it, you can buy me a mate in return.
 # ----------------------------------------------------------------------------
-#
 
-start(){
-	mount /mnt/token/ && /usr/local/bin/udev.py 
-    umount /mnt/token
-	return $?
-}
+import cashier
+import sys
 
-#stop(){
-#	umount /mnt/token &&
-#	return $?
-#}
+cashier = cashier.Cashier()
 
-$1
+purse = open('/mnt/token/purse', 'r')
+purselines = purse.readlines()
 
-exit $?
+for token in purselines:
+    cashier.checkToken(token)
+
+cashier.checkCredit()
+
+sys.exit(0)
