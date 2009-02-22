@@ -8,8 +8,6 @@
 # this stuff is worth it, you can buy me a mate in return.
 # ----------------------------------------------------------------------------
 
-# TODO: Add SQL (;
-
 import sqlite3
 import hashlib
 import logging
@@ -28,7 +26,7 @@ class Token:
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         ch.setFormatter(formatter)
         self.log.addHandler(ch)
-        self.log.setLevel(logging.DEBUG)
+        self.log.setLevel(logging.INFO)
 #        self.log.setLevel(logging.WARNING)
         self.log.debug('__init__(): invoked')
 
@@ -47,11 +45,15 @@ class Token:
         self.log.debug('check(): invoked')
         if self.tokenreset:
             self.log.info('check(): Resetting in-memory token data')
-
             self.tokenreset = False
             self.tokencount = 0
             self.tokenlist = []
         
+        if token in self.tokenlist:
+            self.log.warning('check(): token already in tokenlist')
+            self.log.info('check(): aborting')
+            return False
+
         hashtoken = self.hash(token)
 
         self.db_cur.execute('SELECT hash FROM tokens WHERE used=0 AND hash=? LIMIT 1', (hashtoken,))
@@ -74,21 +76,12 @@ class Token:
             
     def assets(self, priceline):
         self.log.debug('assets(): invoked')
-        self.cost = 0
-        #print "translating priceline"
         self.db_cur.execute('SELECT price FROM pricelines WHERE priceline=?', (priceline,))
-        #print "executed query"
         price = self.db_cur.fetchone()
-        #print "price=",price
-        self.log.info('assets(): price=%s' % price)
-        #while price[0] != priceline:
-        #price = self.db_cur.fetchone()
-        #    print "new price=",price
-        
-        #self.cost = int(price[0])
+        self.log.debug('assets(): price=%s' % price)
         self.cost = int(price[0])
         self.log.info('assets(): cost=%s' % self.cost)
-        #print "COST: %s" % self.cost
+        
         if self.tokencount >= self.cost:
             self.log.info('assets(): Liquidity is given')
             return True
@@ -104,10 +97,8 @@ class Token:
                 if rejected < self.cost:
                     self.log.info('finish(): Rejecting %s' % token)
                     hashtoken = self.hash(token)
-                    # print "REJECT TOKEN: %s (%s)" % (token, rejected)
                     self.db.execute('UPDATE tokens SET used=1 WHERE hash=?', (hashtoken,))
-                    rejected = rejected+1
-         
+                    rejected = rejected+1 
         self.db.commit()
         self.tokenreset = True
         return True
