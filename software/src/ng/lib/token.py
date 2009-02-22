@@ -26,8 +26,8 @@ class Token:
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         ch.setFormatter(formatter)
         self.log.addHandler(ch)
-        self.log.setLevel(logging.INFO)
-#        self.log.setLevel(logging.WARNING)
+#        self.log.setLevel(logging.INFO)
+        self.log.setLevel(logging.WARNING)
         self.log.debug('__init__(): invoked')
 
     def add(self, token):

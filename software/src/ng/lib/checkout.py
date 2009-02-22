@@ -26,8 +26,9 @@ class Checkout(threading.Thread):
         self.matemat = matemat.Matemat()
         #logging.basicConfig()
         self.log = logging.getLogger('Checkout')
-        self.log.setLevel(logging.INFO)
-#        self.log.setLevel(logging.WARNING)
+#        self.log.setLevel(logging.DEBUG)
+#        self.log.setLevel(logging.INFO)
+        self.log.setLevel(logging.WARNING)
         ch = logging.StreamHandler()
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         ch.setFormatter(formatter)
@@ -51,11 +52,13 @@ class Checkout(threading.Thread):
     def checkState(self):
         if self.waiting:
             if time.time() >= self.waiting:
+                self.log.debug('checkState(): setting state')
                 self.state = self.nextstate
                 self.newstate = True
                 self.waiting = False
 
     def setState(self,nextstate, wait=0):
+        self.log.debug('setState(%d,%d): invoked'%(nextstate,wait))
         self.waiting = time.time()+wait
         self.nextstate = nextstate
         self.state = self.WAITSTATE
@@ -95,6 +98,7 @@ class Checkout(threading.Thread):
             self.process()
 
     def process(self):
+        #self.log.debug('processing state %d'%self.state)
         if self.state == self.IDLE:
             self.idle()
         elif self.state == self.COUNTING:
@@ -214,6 +218,7 @@ class Checkout(threading.Thread):
         elif self.cmd == "Bp":
             self.setState(self.REPORTING)
             self.report = "Bad Purse!"
+            self.socket.setblocking(0)
 
 # "Testing"
 if __name__ == '__main__':
