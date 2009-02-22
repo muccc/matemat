@@ -17,7 +17,7 @@ import logging
 import threading
 
 class Checkout(threading.Thread):
-    IDLE, COUNTING, CHECKING, WAITING, SERVING, CHECKINGSERVE, ABORTING, WAITSTATE = range(8)
+    IDLE, COUNTING, CHECKING, WAITING, SERVING, CHECKINGSERVE, ABORTING, WAITSTATE, REPORTING = range(9)
     def __init__(self):
         threading.Thread.__init__ ( self )
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -117,6 +117,11 @@ class Checkout(threading.Thread):
             self.serve()
         elif self.state == self.CHECKINGSERVE:
             self.checkserve()
+        elif self.state == self.REPORTING:
+            if self.newstate:
+                self.newstate = False
+                self.matemat.writeLCD(self.report)
+            self.setState(self.IDLE,3)
 
 
     def idle(self):
@@ -206,7 +211,9 @@ class Checkout(threading.Thread):
                 self.socket.setblocking(0)
                 return True
             return False
-                
+        elif self.cmd == "Bp":
+            self.setState(self.REPORTING)
+            self.report = "Bad Purse!"
 
 # "Testing"
 if __name__ == '__main__':

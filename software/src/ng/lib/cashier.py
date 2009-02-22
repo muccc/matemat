@@ -25,7 +25,7 @@ class Cashier:
         self.log.addHandler(ch)
 
         self.log.debug('__init__(): invoked')
-
+        
     def send(self, msg):
         self.log.debug('send(): invoked')
         self.log.info('send(): msg=%s' % msg)
@@ -57,6 +57,10 @@ class Cashier:
                         
         if rcvd: return True
         else: return False
+
+    def reportBadPurse(self): 
+        self.log.debug('reportBadPurse): invoked')
+        sent = self.send("Bp")
 
     def abort(self):
         self.log.debug('abort(): invoked')

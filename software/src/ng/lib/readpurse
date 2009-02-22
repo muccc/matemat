@@ -11,9 +11,13 @@
 import cashier
 import sys
 import time
-
+import os
 cashier = cashier.Cashier()
 if cashier.isReady():
+    if os.path.getsize(sys.argv[1]) > 100000:
+        print "purse is to big!"
+        cashier.reportBadPurse()
+        sys.exit(1)
     purse = open(sys.argv[1], 'r')
     purselines = purse.readlines()
     print "tokens in purse:",len(purselines)
@@ -23,7 +27,7 @@ if cashier.isReady():
     t = time.time()-t
     print "%f checks/s"%(50/t)
     cashier.checkCredit()
+    sys.exit(0)
 else:
     print "cashier is busy"
-
-sys.exit(0)
+    sys.exit(2)
