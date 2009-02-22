@@ -14,18 +14,18 @@ class Matemat:
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         ch.setFormatter(formatter)
         self.log.addHandler(ch)
-        self.log.setLevel(logging.DEBUG)
+        self.log.setLevel(logging.INFO)
         self.log.debug('__init__(): invoked')
 
     def waitForReply(self,reply):
         self.log.debug('waitForReply(): invoked')
-        self.log.info('waitForReply(): reply=%s' % reply)
+        self.log.debug('waitForReply(): reply=%s' % reply)
         while True:
             msg = self.interface.readMessage()
             if msg == False:
                 return False
             if msg in reply:
-                self.log.info('waitForReply(): msg=%s' % msg)
+                self.log.debug('waitForReply(): msg=%s' % msg)
                 return msg
 
 

@@ -26,7 +26,7 @@ class Checkout(threading.Thread):
         self.matemat = matemat.Matemat()
         #logging.basicConfig()
         self.log = logging.getLogger('Checkout')
-        self.log.setLevel(logging.DEBUG)
+        self.log.setLevel(logging.INFO)
 #        self.log.setLevel(logging.WARNING)
         ch = logging.StreamHandler()
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -85,7 +85,7 @@ class Checkout(threading.Thread):
         self.token.pay()
 
     def run(self):
-        self.token = token.Token()      #has to be in thsi thread
+        self.token = token.Token()      #has to be in this thread
         while(1):
             self.checkState()
             if self.fetchCommand():
@@ -135,10 +135,10 @@ class Checkout(threading.Thread):
         if self.newstate:
             self.newstate = False
             self.credit = self.token.eot()
-            self.log.info('wait(): credit=%s' % self.credit)
+            self.log.debug('wait(): credit=%s' % self.credit)
             self.matemat.writeLCD("Credit: %s" % self.credit)
         self.priceline = self.matemat.getPriceline()
-        self.log.info('wait(): priceline=%s' % self.priceline)
+        self.log.debug('wait(): priceline=%s' % self.priceline)
         if self.priceline != 0:
             self.setState(self.CHECKING)
         time.sleep(0.01)
@@ -165,7 +165,7 @@ class Checkout(threading.Thread):
 
     def checkserve(self):
         if not self.matemat.completeserve():
-            self.log.info('serve(): Failed to serve %s' % self.priceline)
+            self.log.info('checkserve(): Failed to serve %s' % self.priceline)
             self.matemat.writeLCD("Failed to serve")
             served = False;
             self.setState(self.ABORT,3)

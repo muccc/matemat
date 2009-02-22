@@ -2,18 +2,25 @@ import serial
 import string
 import sys
 import time
-
+import logging
 class SerialInterface:
     def  __init__ ( self, path2device, baudrate, timeout=0):
         self.ser = serial.Serial(path2device, baudrate)
         self.ser.flushInput()
         self.ser.flushOutput()
+        self.log = logging.getLogger("SerialInterface")
+        ch = logging.StreamHandler()
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        ch.setFormatter(formatter)
+        self.log.addHandler(ch)
+        self.log.setLevel(logging.INFO)
+        self.log.debug("__init__(): invoked")
         if timeout:
             self.ser.setTimeout(timeout)
 
     def writeMessage(self,message):
         enc = "\\0" + message.replace('\\','\\\\') + "\\1";
-        print "writing", enc
+        self.log.debug("writing %s"% enc)
         self.ser.write(enc)
 
     def readMessage(self):
@@ -25,7 +32,7 @@ class SerialInterface:
         while True:
             c = self.ser.read(1)
             if len(c) == 0:             #A timout occured
-                print "TIMEOUT"
+                self.log.warning('TIMEOUT')
                 return False
         #    print "c=", c
         #    continue
@@ -46,15 +53,11 @@ class SerialInterface:
                 start = False
             elif stop:
                 if data[0] == 'D':
-                    print "DEBUG:",time.time(), len(data), data
+                    self.log.info('serial debug message: %d %s'%(len(data), data))
                     data = ""
                     stop = False
                 else:
-                    print time.time(), "received message: len=", len(data),"data=" ,data
-
+                    self.log.debug('received message: len=%d data=%s'%(len(data),data))
                     return data
             elif escaped == False:
                 data += str(d)
-        
-    
-
