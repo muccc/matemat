@@ -13,6 +13,7 @@
 import sqlite3
 import hashlib
 import logger
+import sys
 
 class Token:
     def __init__(self):
@@ -22,7 +23,6 @@ class Token:
         self.db = sqlite3.connect('token.db')
         self.db_cur = self.db.cursor()
         self.tokenlist = []
-        self.hashlib = hashlib.sha512()
         self.log = logger.Logger('Token')
         self.log.debug('__init__(): invoked')
 
@@ -32,6 +32,7 @@ class Token:
     def hash(self, token):
         self.log.debug('hash(): invoked')
         self.log.log('hash(): token=%s' % token)
+        self.hashlib = hashlib.sha512()
         self.hashlib.update(token)
         self.log.log('hash(): return=%s' % self.hashlib.hexdigest())
         return self.hashlib.hexdigest()
@@ -105,6 +106,11 @@ class Token:
 
 if __name__ == '__main__':
     token = Token()
+    token.hash("ppsqmxjdgu")
+    token.hash("ppsqmxjdgu")
+    token.hash("ppsqmxjdgu")
+    token.hash("ppsqmxjdgu")
+    sys.exit(0)
     token.check("frnzjbcns")
     crd = token.eot()
     ret = token.assets('1')
