@@ -2,18 +2,15 @@ import serial
 import string
 import sys
 import time
-import logging
+import logger
+
 class SerialInterface:
     def  __init__ ( self, path2device, baudrate, timeout=0):
         self.ser = serial.Serial(path2device, baudrate)
         self.ser.flushInput()
         self.ser.flushOutput()
-        self.log = logging.getLogger("SerialInterface")
-        ch = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
-        self.log.setLevel(logging.INFO)
+        self.log = logger.Logger("SerialInterface")
+        self.log.level('INFO')
         self.log.debug("__init__(): invoked")
         if timeout:
             self.ser.setTimeout(timeout)

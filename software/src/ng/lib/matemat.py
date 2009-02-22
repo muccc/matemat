@@ -3,18 +3,13 @@
 import serial
 import serialinterface
 import time
-#import logger
-import logging
+import logger
+
 class Matemat:
     def __init__(self):
         self.interface = serialinterface.SerialInterface("/dev/ttyS0",115200,5);
-        #self.log = logger.Logger('Matemat')
-        self.log = logging.getLogger("Matemat")
-        ch = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
-        self.log.setLevel(logging.INFO)
+        self.log = logger.Logger('Matemat')
+        self.log.level('INFO')
         self.log.debug('__init__(): invoked')
 
     def waitForReply(self,reply):

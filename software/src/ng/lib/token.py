@@ -10,7 +10,7 @@
 
 import sqlite3
 import hashlib
-import logging
+import logger
 import sys
 
 class Token:
@@ -21,13 +21,8 @@ class Token:
         self.db = sqlite3.connect('token.db')
         self.db_cur = self.db.cursor()
         self.tokenlist = []
-        self.log = logging.getLogger('Token')
-        ch = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
-#        self.log.setLevel(logging.INFO)
-        self.log.setLevel(logging.WARNING)
+        self.log = logger.Logger('Token')
+        self.log.level('WARNING')
         self.log.debug('__init__(): invoked')
 
     def add(self, token):

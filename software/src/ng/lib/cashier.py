@@ -9,21 +9,15 @@
 # ----------------------------------------------------------------------------
 
 import socket
-import logging
+import logger
 
 class Cashier:
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.connect(('127.0.0.1', 4444))
         self.socket.settimeout(1)
-        self.log = logging.getLogger('Cashier')
-        #        self.log.setLevel(logging.INFO)
-        self.log.setLevel(logging.WARNING)
-        ch = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
-
+        self.log = logger.Logger('Cashier')
+        self.log.level('WARNING')
         self.log.debug('__init__(): invoked')
         
     def send(self, msg):

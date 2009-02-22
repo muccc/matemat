@@ -13,7 +13,7 @@ import sys
 import time
 import token
 import matemat
-import logging
+import logger
 import threading
 
 class Checkout(threading.Thread):
@@ -24,15 +24,9 @@ class Checkout(threading.Thread):
         self.socket.setblocking(0)
         self.socket.bind(('127.0.0.1', 4444))
         self.matemat = matemat.Matemat()
-        #logging.basicConfig()
-        self.log = logging.getLogger('Checkout')
-#        self.log.setLevel(logging.DEBUG)
-#        self.log.setLevel(logging.INFO)
-        self.log.setLevel(logging.WARNING)
-        ch = logging.StreamHandler()
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-        ch.setFormatter(formatter)
-        self.log.addHandler(ch)
+        
+        self.log = logger.Logger('Checkout')
+        self.log.level('WARNING')
         self.log.debug('__init__(): invoked')
         self.state = self.IDLE
         self.newstate = True
