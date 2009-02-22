@@ -13,30 +13,34 @@ import sys
 import time
 import token
 import matemat
-import logger
+import logging
+import threading
 
-class Checkout:
+class Checkout(threading.Thread):
+    IDLE, COUNTING, CHECKING, WAITING, SERVING, CHECKINGSERVE, ABORTING, WAITSTATE = range(8)
     def __init__(self):
+        threading.Thread.__init__ ( self )
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket.setblocking(0)
         self.socket.bind(('127.0.0.1', 4444))
-        self.token = token.Token()
         self.matemat = matemat.Matemat()
-        self.log = logger.Logger('Checkout')
+        #logging.basicConfig()
+        self.log = logging.getLogger('Checkout')
+        self.log.setLevel(logging.DEBUG)
+#        self.log.setLevel(logging.WARNING)
+        ch = logging.StreamHandler()
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        ch.setFormatter(formatter)
+        self.log.addHandler(ch)
         self.log.debug('__init__(): invoked')
-
-    def listen(self):
-        self.log.debug('listen(): invoked')
-        self.matemat.writeLCD("OBEY AND CONSUME")
-        self.log.log('listen(): Waiting for clients')
-        while True:
-            data, self.raddr = self.socket.recvfrom(64)
-            data = data.strip()
-            self.log.log('listen(): data=%s' % data)
-            self.interpret(data)
+        self.state = self.IDLE
+        self.newstate = True
+        self.served = False
+        self.waiting = 0
 
     def send(self, msg):
         self.log.debug('send(): invoked')
-        self.log.log('send(): msg=%s' % msg)
+        self.log.info('send(): msg=%s' % msg)
         # print "sending",msg
         sent = self.socket.sendto(msg, self.raddr)
         if sent == 0:
@@ -44,72 +48,166 @@ class Checkout:
         else:
             return True
 
-    def interpret(self, data):
-        self.log.debug('interpret(): invoked')
-        self.log.log('interpret(): data=%s' % data)
-        # print "interpret:", data
-        cmd = "%s%s" % (data[0], data[1])
-        self.log.log('interpret(): cmd=%s' % cmd)
-        # print "cmd:",cmd
-        tokendata = data[2:]
-        self.log.log('interpret(): tokendata=%s' % tokendata)
-        # print "tokendata:",tokendata
+    def checkState(self):
+        if self.waiting:
+            if time.time() >= self.waiting:
+                self.state = self.nextstate
+                self.newstate = True
+                self.waiting = False
 
-        if cmd == "Ta":
+    def setState(self,nextstate, wait=0):
+        self.waiting = time.time()+wait
+        self.nextstate = nextstate
+        self.state = self.WAITSTATE
+
+    def fetchCommand(self):
+        try:
+            data, self.raddr = self.socket.recvfrom(64)
+            data.strip()
+            if len(data) > 0:
+                self.cmd = "%s%s" % (data[0], data[1])
+                self.log.info('fetchCommand: cmd=%s' % self.cmd)
+                self.data = data[2:].strip()
+                self.log.info('fetchCommand: data=%s' % self.data)
+                return True
+        except:
+            pass
+        return False
+
+    def reset(self):
+        if self.served:
+            self.token.finish(0)
+        self.token.tokenreset = True
+        self.matemat.writeLCD("OBEY AND CONSUME")
+        self.served = False
+
+    def pay(self):
+        self.token.pay()
+
+    def run(self):
+        self.token = token.Token()      #has to be in thsi thread
+        while(1):
+            self.checkState()
+            if self.fetchCommand():
+                if not self.command():
+                    self.log.info('run: command failed')
+                    self.send("FAIL")
+            self.process()
+
+    def process(self):
+        if self.state == self.IDLE:
+            self.idle()
+        elif self.state == self.COUNTING:
+            if self.newstate:
+                self.newstate = False
+                self.socket.setblocking(1)
+                self.matemat.writeLCD("Reading tokens")
+            if self.tokendata:
+                self.token.check(self.tokendata)
+                self.send("OK")
+                #print time.time()
+                self.tokendata = ""
+        elif self.state == self.ABORTING:
+            self.abort()
+        elif self.state == self.WAITING:
+            self.wait()
+        elif self.state == self.CHECKING:
+            self.check()
+        elif self.state == self.SERVING:
+            self.serve()
+        elif self.state == self.CHECKINGSERVE:
+            self.checkserve()
+
+
+    def idle(self):
+        if self.newstate:
+            self.newstate = False
+            self.reset()
+        time.sleep(0.1)
+    def abort(self):
+        if self.newstate:
+            self.newstate = False
+            self.matemat.writeLCD("aborting")
+            self.setState(self.IDLE,3)
+
+    def wait(self):
+        #sys.exit(0)
+        if self.newstate:
+            self.newstate = False
+            self.credit = self.token.eot()
+            self.log.info('wait(): credit=%s' % self.credit)
+            self.matemat.writeLCD("Credit: %s" % self.credit)
+        self.priceline = self.matemat.getPriceline()
+        self.log.info('wait(): priceline=%s' % self.priceline)
+        if self.priceline != 0:
+            self.setState(self.CHECKING)
+        time.sleep(0.01)
+
+    def check(self):
+        liquidity = self.token.assets(self.priceline)
+        if liquidity == False:
+            self.matemat.writeLCD("Not enough credits")
+            self.setState(self.IDLE,3)
+        else:
+            self.setState(self.SERVING)
+
+    def serve(self):
+        if self.matemat.serve(self.priceline):
+            self.log.info('serve(): Serving %s' % self.priceline)
+            self.matemat.writeLCD("Enjoy it")
+            self.served = True;
+            self.setState(self.CHECKINGSERVE)
+        else:
+            self.log.info('serve(): Failed to serve %s' % self.priceline)
+            self.matemat.writeLCD("Failed to serve")
+            served = False;
+            self.setState(self.ABORT,3)
+
+    def checkserve(self):
+        if not self.matemat.completeserve():
+            self.log.info('serve(): Failed to serve %s' % self.priceline)
+            self.matemat.writeLCD("Failed to serve")
+            served = False;
+            self.setState(self.ABORT,3)
+        else:
+            self.setState(self.IDLE)
+           
+    def command(self):
+        self.log.debug('command(): invoked')
+        if self.cmd == "Ta":
             if self.token.add(tokendata):
                 self.send("OK")
                 return True
-            else:
-                self.send("FAIL")
-                return False
-        elif cmd == "Rd":
-            self.send("READY")
-            return True
-        elif cmd == "Ab":
-            self.matemat.writeLCD("OBEY AND CONSUME")
-            return True
-        elif cmd == "Tc":
-            if self.token.check(tokendata):
-                self.send("OK")
+            return False
+        elif self.cmd == "Rd":
+            if self.state == self.IDLE:
+                self.send("READY")
+                return True
+            return False
+        elif self.cmd == "Ab":
+            if self.state != self.IDLE and self.nextstate != self.IDLE:
+                self.setState(self.ABORTING);
+            return False
+        elif self.cmd == "Tc":
+            if self.state == self.IDLE or self.state == self.COUNTING:
+                self.tokendata = self.data
+                if self.state == self.IDLE:
+                    self.setState(self.COUNTING)
                 return True
             else:
-                self.send("FAIL")
                 return False
-        elif cmd == "Td":
-            credit = self.token.eot()
-            self.log.log('interpret(): credit=%s' % credit)
-            self.matemat.writeLCD("Credit: %s" % credit)
-            
-            priceline = 0
-            while priceline == 0:
-                priceline = self.matemat.getPriceline()
-                self.log.log('interpret(): priceline=%s' % priceline)
-                #time.sleep(1)
-
-            # print "checking liquidity"
-
-            liquidity = self.token.assets(priceline)
-
-            if liquidity == False:
-                self.matemat.writeLCD("Not enough credits")
-                #time.sleep(1.0)
-                self.send("FAIL")
-                return False
-
-            if self.matemat.serve(priceline):
-                self.log.log('interpret(): Serving %s' % priceline)
-                self.matemat.writeLCD("Enjoy it")
-                self.matemat.completeserve()
-                self.token.finish(priceline)
-                self.send("OK")
+            return True
+        elif self.cmd == "Td":
+            if self.state == self.COUNTING:
+                self.setState(self.WAITING);
+                self.socket.setblocking(0)
                 return True
-            else:
-                self.log.log('interpret(): Failed to serve %s' % priceline)
-                self.matemat.writeLCD("Failed to serve")
-                self.send("FAIL")
-                return False
+            return False
+                
 
 # "Testing"
 if __name__ == '__main__':
     co = Checkout()
-    co.listen()
+    #co.listen()
+    co.start()
+    co.join()
