@@ -44,7 +44,7 @@ class Matemat:
             if msg == False:
                 return -1
             if msg[0] == 'p':
-                self.log.info('getPriceline(): priceline=%s' % msg[2])
+                self.log.debug('getPriceline(): priceline=%s' % msg[2])
                 return int(msg[2])
 
     def serve(self,priceline):
