@@ -51,7 +51,7 @@ class Checkout:
         cmd = "%s%s" % (data[0], data[1])
         self.log.log('interpret(): cmd=%s' % cmd)
         # print "cmd:",cmd
-        tokendata = data.lstrip("Tacd")
+        tokendata = data[2:]
         self.log.log('interpret(): tokendata=%s' % tokendata)
         # print "tokendata:",tokendata
 

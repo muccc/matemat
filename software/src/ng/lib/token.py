@@ -49,7 +49,9 @@ class Token:
         hashtoken = self.hash(token)
 
         self.db_cur.execute('SELECT hash FROM tokens WHERE used=0 AND hash=? LIMIT 1', (hashtoken,))
-        if self.db_cur.fetchone() == None:
+        ret = self.db_cur.fetchone()
+        self.log.debug('fetch returned %s' % str(ret))
+        if ret:
             self.log.log('check(): %s is unused' % token)
             # print "FOUND UNUSED TOKEN: %s" % token
             self.tokencount = self.tokencount+1
