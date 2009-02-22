@@ -65,6 +65,9 @@ class Checkout:
         elif cmd == "Rd":
             self.send("READY")
             return True
+        elif cmd == "Ab":
+            self.matemat.writeLCD("OBEY AND CONSUME")
+            return True
         elif cmd == "Tc":
             if self.token.check(tokendata):
                 self.send("OK")
