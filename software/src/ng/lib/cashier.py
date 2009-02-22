@@ -9,19 +9,26 @@
 # ----------------------------------------------------------------------------
 
 import socket
-import logger
+import logging
 
 class Cashier:
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.connect(('127.0.0.1', 4444))
         self.socket.settimeout(1)
-        self.log = logger.Logger('Cashier')
+        self.log = logging.getLogger('Cashier')
+        #        self.log.setLevel(logging.INFO)
+        self.log.setLevel(logging.WARNING)
+        ch = logging.StreamHandler()
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        ch.setFormatter(formatter)
+        self.log.addHandler(ch)
+
         self.log.debug('__init__(): invoked')
 
     def send(self, msg):
         self.log.debug('send(): invoked')
-        self.log.log('send(): msg=%s' % msg)
+        self.log.info('send(): msg=%s' % msg)
 
         sent = self.socket.send(msg)
         if sent == 0:
@@ -31,7 +38,7 @@ class Cashier:
 
     def recv(self, expect):
         self.log.debug('recv(): invoked')
-        self.log.log('recv(): expect=%s' % expect)
+        self.log.info('recv(): expect=%s' % expect)
         try:
             data = self.socket.recv(64)
         except:
@@ -62,7 +69,7 @@ class Cashier:
 
     def checkToken(self, token):
         self.log.debug('checkToken(): invoked')
-        self.log.log('checkToken(): token=%s' % token)
+        self.log.info('checkToken(): token=%s' % token)
         sent = self.send("Tc%s" % token)
 
         if sent: rcvd = self.recv("OK")
