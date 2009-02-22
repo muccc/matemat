@@ -17,47 +17,54 @@ class Cashier:
         self.socket.connect(('127.0.0.1', 4444))
         self.socket.settimeout(1)
         self.log = logger.Logger('Cashier')
-        self.log.level('WARNING')
-        self.log.debug('__init__(): invoked')
+        self.log.level('INFO')
+        self.log.info('__init__(): invoked')
         
     def send(self, msg):
-        self.log.debug('send(): invoked')
-        self.log.info('send(): msg=%s' % msg)
+        self.log.info('send(%s): invoked' % msg)
 
         sent = self.socket.send(msg)
-        if sent == 0:
-            return False
-        else:
+        if sent != 0:
+            self.log.debug('send(%s): Send OK' % msg)
             return True
+        else:
+            self.log.debug('send(%s): Send failed' % msg)
+            return False
 
     def recv(self, expect):
-        self.log.debug('recv(): invoked')
-        self.log.info('recv(): expect=%s' % expect)
+        self.log.info('recv(%s): invoked' % expect)
         try:
             data = self.socket.recv(64)
         except:
             return False
+        
         data = data.strip()
         if data == expect:
+            self.log.debug('recv(%s): Receive OK' % expect)
+            return True
+        else:
+            self.log.debug('recv(%s): Receive failed' % expect)
+            return False
+
+    def isReady(self):
+        self.log.info('isReady(): invoked')
+        sent = self.send("Rd")
+        if sent:
+            rcvd = self.recv("READY")
+        else:
+            return False
+                        
+        if rcvd:
             return True
         else:
             return False
 
-    def isReady(self):
-        self.log.debug('isReady(): invoked')
-        sent = self.send("Rd")
-        if sent: rcvd = self.recv("READY")
-        else: return False
-                        
-        if rcvd: return True
-        else: return False
-
     def reportBadPurse(self): 
-        self.log.debug('reportBadPurse): invoked')
+        self.log.info('reportBadPurse(): invoked')
         sent = self.send("Bp")
 
     def abort(self):
-        self.log.debug('abort(): invoked')
+        self.log.info('abort(): invoked')
         sent = self.send("Ab")
         if sent: rcvd = self.recv("OK")
         else: return False
@@ -66,25 +73,24 @@ class Cashier:
         else: return False
 
     def checkToken(self, token):
-        self.log.debug('checkToken(): invoked')
-        self.log.info('checkToken(): token=%s' % token)
+        self.log.info('checkToken(%s): invoked' % token)
         sent = self.send("Tc%s" % token)
 
-        if sent: rcvd = self.recv("OK")
-        else: return False
+        if sent:
+            rcvd = self.recv("OK")
+        else:
+            return False
         
-        if rcvd: return True
-        else: return False
+        if rcvd:
+            self.log.debug('checkToken(%s): True' % token)
+            return True
+        else:
+            self.log.debug('checkToken(%s): False' % token)
+            return False
 
     def checkCredit(self):
-        self.log.debug('checkCredit(): invoked')
+        self.log.info('checkCredit(): invoked')
         sent = self.send("Td")
-
-#        if sent: rcvd = self.recv("OK")
-#        else: return False
-
-#        if rcvd: return True
-#        else: return False
 
 # "Testing"
 
