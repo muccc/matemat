@@ -138,8 +138,11 @@ class Checkout(threading.Thread):
             self.log.debug('wait(): credit=%s' % self.credit)
             self.matemat.writeLCD("Credit: %s" % self.credit)
         self.priceline = self.matemat.getPriceline()
-        self.log.debug('wait(): priceline=%s' % self.priceline)
-        if self.priceline != 0:
+        if self.priceline == -1: 
+            self.matemat.writeLCD("TIMEOUT") 
+            self.setState(self.ABORTING,3)
+        elif self.priceline != 0:
+            self.log.info('wait(): priceline=%s' % self.priceline)
             self.setState(self.CHECKING)
         time.sleep(0.01)
 
@@ -170,7 +173,7 @@ class Checkout(threading.Thread):
             served = False;
             self.setState(self.ABORT,3)
         else:
-            self.setState(self.IDLE)
+            self.setState(self.IDLE,3)
            
     def command(self):
         self.log.debug('command(): invoked')
