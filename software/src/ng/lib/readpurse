@@ -10,14 +10,18 @@
 
 import cashier
 import sys
+import time
 
 cashier = cashier.Cashier()
 if cashier.isReady():
     purse = open(sys.argv[1], 'r')
     purselines = purse.readlines()
     print "tokens in purse:",len(purselines)
+    t = time.time()
     for token in purselines:
         cashier.checkToken(token)
+    t = time.time()-t
+    print "%f checks/s"%(50/t)
     cashier.checkCredit()
 else:
     print "cashier is busy"
