@@ -8,9 +8,9 @@
 # this stuff is worth it, you can buy me a mate in return.
 # ----------------------------------------------------------------------------
 
-import cashier
 import sys
+import matepay.cashier
 
-cashier = cashier.Cashier()
+cashier = matepay.cashier.Cashier()
 cashier.abort()
 sys.exit(0)

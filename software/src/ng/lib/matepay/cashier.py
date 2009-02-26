@@ -9,30 +9,29 @@
 # ----------------------------------------------------------------------------
 
 import socket
-import logger
+from matepay.logger import flogger, getLogger
 
 class Cashier:
+    log = getLogger('Cashier')
+
+    @flogger(log)
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket.connect(('127.0.0.1', 4444))
         self.socket.settimeout(1)
-        self.log = logger.Logger('Cashier')
-        self.log.level('INFO')
-        self.log.info('__init__(): invoked')
         
+    @flogger(log)
     def send(self, msg):
-        self.log.info('send(%s): invoked' % msg)
-
         sent = self.socket.send(msg)
         if sent != 0:
-            self.log.debug('send(%s): Send OK' % msg)
+            self.log.debug('"%s": Send OK' % msg)
             return True
         else:
-            self.log.debug('send(%s): Send failed' % msg)
+            self.log.debug('"%s": Send failed' % msg)
             return False
-
+    
+    @flogger(log)
     def recv(self, expect):
-        self.log.info('recv(%s): invoked' % expect)
         try:
             data = self.socket.recv(64)
         except:
@@ -40,14 +39,14 @@ class Cashier:
         
         data = data.strip()
         if data == expect:
-            self.log.debug('recv(%s): Receive OK' % expect)
+            self.log.debug('"%s": Receive OK' % expect)
             return True
         else:
-            self.log.debug('recv(%s): Receive failed' % expect)
+            self.log.debug('"%s": Receive failed' % expect)
             return False
 
+    @flogger(log)
     def isReady(self):
-        self.log.info('isReady(): invoked')
         sent = self.send("Rd")
         if sent:
             rcvd = self.recv("READY")
@@ -59,12 +58,12 @@ class Cashier:
         else:
             return False
 
-    def reportBadPurse(self): 
-        self.log.info('reportBadPurse(): invoked')
+    @flogger(log)
+    def reportBadPurse(self):
         sent = self.send("Bp")
 
+    @flogger(log)
     def abort(self):
-        self.log.info('abort(): invoked')
         sent = self.send("Ab")
         if sent: rcvd = self.recv("OK")
         else: return False
@@ -72,8 +71,8 @@ class Cashier:
         if rcvd: return True
         else: return False
 
+    @flogger(log)
     def checkToken(self, token):
-        self.log.info('checkToken(%s): invoked' % token)
         sent = self.send("Tc%s" % token)
 
         if sent:
@@ -82,14 +81,14 @@ class Cashier:
             return False
         
         if rcvd:
-            self.log.debug('checkToken(%s): True' % token)
+            self.log.debug('"%s": True' % token)
             return True
         else:
-            self.log.debug('checkToken(%s): False' % token)
+            self.log.debug('"%s": False' % token)
             return False
 
+    @flogger(log)
     def checkCredit(self):
-        self.log.info('checkCredit(): invoked')
         sent = self.send("Td")
 
 # "Testing"

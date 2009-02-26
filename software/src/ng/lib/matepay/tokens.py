@@ -10,10 +10,13 @@
 
 import sqlite3
 import hashlib
-import logger
 import sys
 
+from matepay.logger import flogger, getLogger
+
 class Token:
+    log = getLogger('Token')
+
     def __init__(self):
         self.tokencount = 0
         self.cost = 0
@@ -21,32 +24,32 @@ class Token:
         self.db = sqlite3.connect('token.db')
         self.db_cur = self.db.cursor()
         self.tokenlist = []
-        self.log = logger.Logger('Token')
-        self.log.level('WARNING')
-        self.log.debug('__init__(): invoked')
+
+    def bootstrap(self):
+        pass
 
     def add(self, token):
         return True 
     
+    @flogger(log)
     def hash(self, token):
-        self.log.debug('hash(): invoked')
-        self.log.info('hash(): token=%s' % token)
+        self.log.info('token=%s' % token)
         self.hashlib = hashlib.sha512()
         self.hashlib.update(token)
-        self.log.info('hash(): return=%s' % self.hashlib.hexdigest())
+        self.log.info('return=%s' % self.hashlib.hexdigest())
         return self.hashlib.hexdigest()
 
+    @flogger(log)
     def check(self, token):
-        self.log.debug('check(): invoked')
         if self.tokenreset:
-            self.log.info('check(): Resetting in-memory token data')
+            self.log.info('Resetting in-memory token data')
             self.tokenreset = False
             self.tokencount = 0
             self.tokenlist = []
         
         if token in self.tokenlist:
-            self.log.warning('check(): token already in tokenlist')
-            self.log.info('check(): aborting')
+            self.log.warning('token already in tokenlist')
+            self.log.info('aborting')
             return False
 
         hashtoken = self.hash(token)
@@ -55,42 +58,42 @@ class Token:
         ret = self.db_cur.fetchone()
         self.log.debug('fetch returned %s' % str(ret))
         if ret:
-            self.log.info('check(): %s is unused' % token)
+            self.log.info('%s is unused' % token)
             # print "FOUND UNUSED TOKEN: %s" % token
             self.tokencount = self.tokencount+1
             self.tokenlist.append(token)
             return True
         else:
-            self.log.info('check(): %s is used' % token)
+            self.log.info('%s is used' % token)
             return False
 
+    @flogger(log)
     def eot(self):
-        self.log.debug('eot(): invoked')
-        self.log.info('eot(): Number of valid tokens: %s' % self.tokencount)
+        self.log.info('Number of valid tokens: %s' % self.tokencount)
         return self.tokencount
-            
+    
+    @flogger(log)
     def assets(self, priceline):
-        self.log.debug('assets(): invoked')
         self.db_cur.execute('SELECT price FROM pricelines WHERE priceline=?', (priceline,))
         price = self.db_cur.fetchone()
-        self.log.debug('assets(): price=%s' % price)
+        self.log.debug('price=%s' % price)
         self.cost = int(price[0])
-        self.log.info('assets(): cost=%s' % self.cost)
+        self.log.info('cost=%s' % self.cost)
         
         if self.tokencount >= self.cost:
-            self.log.info('assets(): Liquidity is given')
+            self.log.info('Liquidity is given')
             return True
         else:
-            self.log.info('assets(): Liquidity is not given')
+            self.log.info('Liquidity is not given')
             return False
 
+    @flogger(log)
     def finish(self, priceline):
-        self.log.debug('finish(): invoked')
         rejected = 0
         if self.cost != 2342:
             for token in self.tokenlist:
                 if rejected < self.cost:
-                    self.log.info('finish(): Rejecting %s' % token)
+                    self.log.info('Rejecting %s' % token)
                     hashtoken = self.hash(token)
                     self.db.execute('UPDATE tokens SET used=1 WHERE hash=?', (hashtoken,))
                     rejected = rejected+1 
@@ -109,3 +112,4 @@ if __name__ == '__main__':
     crd = token.eot()
     ret = token.assets('1')
     token.finish(1)
+

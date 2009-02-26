@@ -2,22 +2,23 @@ import serial
 import string
 import sys
 import time
-import logger
+
+from matepay.logger import flogger,getLogger
 
 class SerialInterface:
+    log = getLogger('SerialInterface')
+    
+    @flogger(log)
     def  __init__ ( self, path2device, baudrate, timeout=0):
         self.ser = serial.Serial(path2device, baudrate)
         self.ser.flushInput()
         self.ser.flushOutput()
-        self.log = logger.Logger("SerialInterface")
-        self.log.level('INFO')
-        self.log.debug("__init__(): invoked")
         if timeout:
             self.ser.setTimeout(timeout)
 
     def writeMessage(self,message):
         enc = "\\0" + message.replace('\\','\\\\') + "\\1";
-        self.log.debug("writing %s"% enc)
+        self.log.debug('writing %s' % enc)
         self.ser.write(enc)
 
     def readMessage(self):
@@ -58,3 +59,4 @@ class SerialInterface:
                     return data
             elif escaped == False:
                 data += str(d)
+

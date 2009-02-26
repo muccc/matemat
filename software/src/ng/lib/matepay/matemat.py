@@ -1,64 +1,62 @@
 #!/usr/bin/python
 
-import serial
-import serialinterface
 import time
-import logger
+
+import matepay.serialinterface
+from matepay.logger import getLogger, flogger
 
 class Matemat:
-    def __init__(self):
-        self.interface = serialinterface.SerialInterface("/dev/ttyS0",115200,5);
-        self.log = logger.Logger('Matemat')
-        self.log.level('INFO')
-        self.log.debug('__init__(): invoked')
+    log = getLogger('Matemat')
 
-    def waitForReply(self,reply):
-        self.log.debug('waitForReply(): invoked')
-        self.log.debug('waitForReply(): reply=%s' % reply)
+    def __init__(self):
+        self.interface = serialinterface.SerialInterface("/dev/ttyS0",115200,5)
+        pass
+
+    @flogger(log)
+    def _waitForReply(self,reply):
+        self.log.debug('reply=%s' % reply)
         while True:
             msg = self.interface.readMessage()
             if msg == False:
                 return False
             if msg in reply:
-                self.log.debug('waitForReply(): msg=%s' % msg)
+                self.log.debug('msg=%s' % msg)
                 return msg
 
-
+    @flogger(log)
     def writeLCD(self, msg):
-        self.log.debug('writeLCD(): invoked')
         self.log.info('writeLCD(): msg=%s' % msg)
         msg = "d"+msg
         self.interface.writeMessage(msg);
-        return self.waitForReply(["dD"])
+        return self._waitForReply(["dD"])
     
+    @flogger(log)
     def getPriceline(self):
-        self.log.debug('getPriceline(): invoked')
         self.interface.writeMessage("p")
         while True:
             msg = self.interface.readMessage()
             if msg == False:
                 return -1
             if msg[0] == 'p':
-                self.log.debug('getPriceline(): priceline=%s' % msg[2])
+                self.log.debug('priceline=%s' % msg[2])
                 return int(msg[2])
 
+    @flogger(log)
     def serve(self,priceline):
-        self.log.debug('serve(): invoked')
-        self.log.info('serve(): priceline=%s' % priceline)
+        self.log.info('priceline=%s' % priceline)
         self.interface.writeMessage("s"+str(priceline))
-        ret = self.waitForReply(["sO","sN"])
+        ret = self._waitForReply(["sO","sN"])
         if ret == False:
             return False
         if ret == "sN":
             return False
         return True
 
+    @flogger(log)
     def completeserve(self):
-        self.log.debug('completeserve(): invoked')
-        return self.waitForReply(["sD"])
+        return self._waitForReply(["sD"])
 
 # "Testing"
-
 if __name__ == '__main__':
     m = Matemat()
     m.writeLCD("luvv")
@@ -66,3 +64,4 @@ if __name__ == '__main__':
         time.sleep(0.2)
     m.serve(3)
     m.completeserve()
+
