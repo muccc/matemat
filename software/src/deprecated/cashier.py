@@ -15,7 +15,7 @@ import sys
 import getopt
 import os
 
-#debug = True
+debug = True
 
 ###
 ## msg2lcd(message): Send a message to the matemat LCD.
