@@ -1,8 +1,0 @@
-Token sollen optional ein Verfallsdatum haben.
-Token sollen expiren koennen. Nach 10j kommt jemand, sind ausgleaufen ,hab ich nciht benutzt.
-Token sollen revoked werden koennen.
-Datum der ausgabe in db
-Skript/screen fuer Kassenwart auf dem Server mit der Master DB
-Stuendlich fuer eine Wochebackups backups der db
-Matemat pullt seine db sebstaendig8alle x zeiteinheite, oder unbekannten tokens)
-
