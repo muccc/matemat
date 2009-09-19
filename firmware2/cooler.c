@@ -16,11 +16,9 @@ void cooler_init(void)
 
 void cooler_tick(void)     //alle 10ms
 {
-    static uint16_t count = 0;
     cooler.updated = 0;
-    if(temperature.updated == 1){
+    if(temperature.updated == 1 && temperature.temp[TEMP_MIDDLE] < 100){
         cooler.updated = 1;
-        count = 50;
         if(cooler.state == COOLER_IDLE){
             if(temperature.temp[TEMP_BOTTOM] > temperature.temp[TEMP_START]){
                 cooler.state = COOLER_COOLING;
