@@ -87,15 +87,17 @@ int main(void)
     uint8_t gotcmd = 0;
     //char buffer[20];
 
+    uart_init( UART_BAUD_SELECT(UART_BAUDRATE,F_CPU));
+    debug(1,"reset!");
+    wdt_enable(WDTO_2S);
     lcd_init(LCD_DISP_ON);
     lcd_clrscr();
     lcd_puts_P("booting");
-    uart_init( UART_BAUD_SELECT(UART_BAUDRATE,F_CPU));
     i2c_init();
     lm75_init();
     OCR1A = (F_CPU/PRESCALER1/F_TIMER1)-1UL;
     TCCR1B = 1<<WGM12 | 1<<CS10;           //ctc, div by 1
-    TIMSK1 |= 1<<OCIE1A;         //enable timer interrupt
+    TIMSK |= 1<<OCIE1A;         //enable timer interrupt
     cooler_init();
     temperature_init();
     uptime_init();
@@ -103,7 +105,7 @@ int main(void)
     display_init();
     sei();
     display_tick(1);
-    debug(1,"reset!"); 
+    debug(1,"init done"); 
     while(1){
         gotcmd = serial_readline();
         if(timebase1s){

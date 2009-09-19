@@ -41,8 +41,8 @@
 
 
 # MCU name
-MCU = atmega644
-#MCU = atmega32
+#MCU = atmega644
+MCU = atmega16
 #MCU = atmega16
 
 AVRDUDE_LFUSE_FLAGS = -U lfuse:w:0xe7:m
