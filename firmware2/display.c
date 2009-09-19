@@ -21,7 +21,7 @@ void printtemp(uint16_t t, uint8_t x, uint8_t y)
 void display_init(void)
 {
     lcd_clrscr();
-    lcd_puts_P("   Matemat ready");
+    lcd_puts_P("   Matemat blubb");
     lcd_gotoxy(0,2);
     lcd_puts_P("Middle: ");
 
