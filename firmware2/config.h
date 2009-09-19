@@ -5,8 +5,8 @@
 #define DEBUGLEVEL          4
 
 //Temperatures to start/stop cooling
-#define TEMP_START_VAL    15
-#define TEMP_STOP_VAL    10
+#define TEMP_START_VAL    12
+#define TEMP_STOP_VAL    7
 
 //Sensor addresses
 #define BOTTOM_ADR      3
