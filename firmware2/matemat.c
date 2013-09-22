@@ -30,7 +30,6 @@ volatile uint8_t timebase1s = 0;
 volatile uint8_t timebase10ms = 0;
 
 ISR(TIMER1_COMPA_vect )
-//volatile uint8_t  
 {
     static uint16_t count1s = PRE_1S;
     static uint16_t count10ms = PRE_10MS;
@@ -108,6 +107,7 @@ int main(void)
     display_tick(1);
     debug(1,"init done"); 
     while(1){
+        wdt_reset();
         gotcmd = serial_readline();
         if(timebase1s){
             timebase1s = 0;
@@ -120,7 +120,6 @@ int main(void)
             priceline_tick();
             display_tick(0);
         }
-        wdt_reset();
         if(gotcmd){
            cmd(serial_buffer, gotcmd);
            gotcmd = 0;
