@@ -28,9 +28,9 @@
 volatile uint8_t timebase = 0;
 volatile uint8_t timebase1s = 0;
 volatile uint8_t timebase10ms = 0;
+
+ISR(TIMER1_COMPA_vect )
 //volatile uint8_t  
-//ISR(SIG_OUTPUT_COMPARE1A)       //1ms
-ISR(TIM1_COMPA_vect)
 {
     static uint16_t count1s = PRE_1S;
     static uint16_t count10ms = PRE_10MS;

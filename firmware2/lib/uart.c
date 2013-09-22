@@ -83,8 +83,8 @@ LICENSE:
   || defined(__AVR_ATmega323__)
   /* ATmega with one USART */
  #define ATMEGA_USART
- #define UART0_RECEIVE_INTERRUPT   UART_RX_vect
- #define UART0_TRANSMIT_INTERRUPT  UART_UDRE_vect
+ #define UART0_RECEIVE_INTERRUPT   USART_RXC_vect 
+ #define UART0_TRANSMIT_INTERRUPT  USART_UDRE_vect 
  #define UART0_STATUS   UCSRA
  #define UART0_CONTROL  UCSRB
  #define UART0_DATA     UDR
