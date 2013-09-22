@@ -20,5 +20,6 @@ struct temperaturedata{
 extern struct temperaturedata temperature;
 void temperature_init(void);
 void temperature_tick(void);
+void temperature_dead_time(uint16_t deadtime);
 
 #endif

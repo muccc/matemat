@@ -23,11 +23,13 @@ void cooler_tick(void)     //alle 10ms
             if(temperature.temp[TEMP_BOTTOM] > temperature.temp[TEMP_START]){
                 cooler.state = COOLER_COOLING;
                 PIN_SET(MATEMAT_COOLER);
+                temperature_dead_time(300);
             }
         }else if(cooler.state == COOLER_COOLING){
             if(temperature.temp[TEMP_BOTTOM] < temperature.temp[TEMP_STOP]){
                 cooler.state = COOLER_IDLE;
                 PIN_CLEAR(MATEMAT_COOLER);
+                temperature_dead_time(300);
             }
         }
 
