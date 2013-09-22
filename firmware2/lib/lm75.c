@@ -26,7 +26,7 @@ void lm75_sprintf_temp(char * s, int16_t t, uint8_t pad)
 {
     uint8_t b;
     if(t == 100){
-        sprintf(s,"# C");
+        sprintf(s,"  # C");
     }else{
         if(t==-1){
             if(pad)
