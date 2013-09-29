@@ -9,8 +9,8 @@
 #define TEMP_STOP_VAL    9
 
 //Sensor addresses
-#define BOTTOM_ADR      3
-#define MIDDLE_ADR      7
+#define BOTTOM_ADR      7
+#define MIDDLE_ADR      3
 
 #define PRICELINE1_PORT C
 #define PRICELINE1_PIN 4
