@@ -41,14 +41,11 @@
 
 
 # MCU name
-#MCU = atmega644
 MCU = atmega16
-#MCU = atmega16
 
-AVRDUDE_LFUSE_FLAGS = -U lfuse:w:0xe7:m
-AVRDUDE_HFUSE_FLAGS = -U hfuse:w:0xd0:m
-AVRDUDE_EFUSE_FLAGS = -U efuse:w:0xfd:m
-
+# Full swing, BOD 4.0 V, 512 W bootloader
+AVRDUDE_LFUSE_FLAGS = -U lfuse:w:0x1f:m
+AVRDUDE_HFUSE_FLAGS = -U hfuse:w:0xc2:m
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the 
@@ -463,7 +460,6 @@ gccversion :
 fuse:
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_HFUSE_FLAGS)
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_LFUSE_FLAGS)
-	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_EFUSE_FLAGS)
 
 
 # Program the device.  
