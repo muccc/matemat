@@ -285,9 +285,11 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 # to get a full listing.
 #
 #AVRDUDE_PROGRAMMER = usbasp 
-#AVRDUDE_PROGRAMMER = avr910
+AVRDUDE_PROGRAMMER = avr109
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = /dev/ttyUSB0
+
+AVRDUDE_SPEED = 115200
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
@@ -311,7 +313,8 @@ AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
 AVRDUDE_FLAGS = -p $(MCU) 
 
 ifdef AVRDUDE_PROGRAMMER
-AVRDUDE_FLAGS += -c $(AVRDUDE_PROGRAMMER)
+AVRDUDE_FLAGS += -c $(AVRDUDE_PROGRAMMER) -P $(AVRDUDE_PORT)
+AVRDUDE_FLAGS += -b $(AVRDUDE_SPEED)
 endif
 
 AVRDUDE_FLAGS += $(AVRDUDE_NO_VERIFY)
@@ -464,9 +467,11 @@ fuse:
 
 # Program the device.  
 program: $(TARGET).hex $(TARGET).eep
+	./start-bootloader
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
 
 program-flash: $(TARGET).hex $(TARGET).eep
+	./start-bootloader
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 # Generate avr-gdb config/init file which does the following:
 #     define the reset signal, load the target file, connect to target, and set 
