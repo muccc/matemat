@@ -9,7 +9,7 @@ extern uint8_t serial_buffer[SERIAL_BUFFERLEN];
 
 #define SERIAL_ESCAPE   '\\'
 #define SERIAL_START    '0'
-#define SERIAL_END    '1'
+#define SERIAL_END    '9'
 
 void serial_putcenc(uint8_t c);
 void serial_putsenc(char * s);
