@@ -4,18 +4,20 @@
 #include "lib/lcd.h"
 #include "display.h"
 #include "config.h"
-#include "lib/lm75.h"
 #include "temperature.h"
 #include "cooler.h"
 #include "uptime.h"
 #include "priceline.h"
 
-void printtemp(uint16_t t, uint8_t x, uint8_t y)
+void printtemp(uint8_t index, uint8_t x, uint8_t y)
 {
     char buf[20];
     lcd_gotoxy(x,y);
-    lm75_sprintf_temp(buf, t, 1);
+    temperature_format(index, buf);
     lcd_puts(buf);
+    lcd_putc(' ');
+    lcd_putc(0xDF);
+    lcd_putc('C');
 }
 
 void display_init(void)
@@ -106,7 +108,7 @@ void display_putcoolerstate(void)
 
 void display_updatetemp(void)
 {
-    printtemp(temperature.temp[TEMP_BOTTOM],8,3);
-    printtemp(temperature.temp[TEMP_MIDDLE],8,2);   
+    printtemp(TEMP_BOTTOM,8,3);
+    printtemp(TEMP_MIDDLE,8,2);   
 }
 

@@ -10,7 +10,7 @@ struct pricelinedata{
 };
 extern volatile struct pricelinedata priceline;
 
-inline void priceline_interrupt(void);
+void priceline_interrupt(void);
 uint8_t priceline_get(void);
 uint8_t priceline_serve(uint8_t pl);
 void priceline_init(void);

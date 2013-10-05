@@ -9,8 +9,6 @@
 #include "config.h"
 #include "lib/uart.h"
 #include "lib/lcd.h"
-#include "lib/i2cmaster.h"
-#include "lib/lm75.h"
 #include "debug.h"
 #include "serial_handler.h"
 #include "temperature.h"
@@ -88,13 +86,13 @@ int main(void)
     //char buffer[20];
 
     uart_init( UART_BAUD_SELECT(UART_BAUDRATE,F_CPU));
+    sei();
+
     debug(1,"reset!");
     wdt_enable(WDTO_2S);
     lcd_init(LCD_DISP_ON);
     lcd_clrscr();
     lcd_puts_P("booting");
-    i2c_init();
-    lm75_init();
     OCR1A = (F_CPU/PRESCALER1/F_TIMER1)-1UL;
     TCCR1B = 1<<WGM12 | 1<<CS10;           //ctc, div by 1
     TIMSK |= 1<<OCIE1A;         //enable timer interrupt
@@ -103,7 +101,6 @@ int main(void)
     uptime_init();
     priceline_init();
     display_init();
-    sei();
     display_tick(1);
     debug(1,"init done"); 
     while(1){

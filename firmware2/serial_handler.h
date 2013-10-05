@@ -13,8 +13,8 @@ extern uint8_t serial_buffer[SERIAL_BUFFERLEN];
 
 void serial_putcenc(uint8_t c);
 void serial_putsenc(char * s);
-inline void serial_putStart(void);
-inline void serial_putStop(void);
+void serial_putStart(void);
+void serial_putStop(void);
 void serial_sendFrames(char * s);
 void serial_sendFramec(uint8_t s);
 void serial_putenc(uint8_t * d, uint16_t n);

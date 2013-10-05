@@ -86,9 +86,7 @@ OBJDIR = .
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c \
 	lib/uart.c \
-	lib/twimaster.c \
 	lib/lcd.c \
-	lib/lm75.c \
 	debug.c \
 	serial_handler.c \
 	temperature.c \
@@ -96,6 +94,9 @@ SRC = $(TARGET).c \
 	cooler.c \
 	uptime.c \
 	priceline.c \
+    ds18x20/ds18x20.c \
+    ds18x20/crc8.c \
+    ds18x20/onewire.c
 
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC = 
@@ -136,7 +137,7 @@ EXTRAINCDIRS =
 #     gnu89 = c89 plus GCC extensions
 #     c99   = ISO C99 standard (not yet fully implemented)
 #     gnu99 = c99 plus GCC extensions
-CSTANDARD = -std=gnu89
+CSTANDARD = -std=gnu99
 
 
 # Place -D or -U options here for C sources
