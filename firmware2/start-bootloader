@@ -1,5 +1,5 @@
 #!/bin/bash
-echo -n "\\0r\\1" > /dev/ttyUSB0
+echo -n "\\0r\\9" > /dev/ttyUSB0
 
 for i in {1..10}
 do
