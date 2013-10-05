@@ -1,5 +1,8 @@
 #include "uptime.h"
+#include "debug.h"
 #include <stdint.h>
+#include <string.h>
+#include <stdio.h>
 
 struct uptimedata uptime;
 
@@ -17,6 +20,9 @@ void uptime_tick(void)
         uptime.updated = 1;
         count = 100;
         uptime.uptime++;
+        char buffer[64];
+        sprintf(buffer, "uptime=%lu", uptime.uptime);
+        debug(2,buffer);
     }
 }
 
