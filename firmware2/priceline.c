@@ -81,7 +81,6 @@ uint8_t priceline_serve(uint8_t pl)
 
 void priceline_tick(void)
 {
-    char buffer[20];
     static uint16_t count = 0;
     priceline.updated = 0;
     if(count-- == 0){
@@ -96,7 +95,8 @@ void priceline_tick(void)
             }
         }
         count = 5;
-        /*if(PIN_HIGH(PRICELINE1)){
+        /*char buffer[20];
+        if(PIN_HIGH(PRICELINE1)){
             debug(8,"PL1 DOWN");
         }else{
             debug(8,"PL1 UP");
