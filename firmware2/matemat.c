@@ -56,19 +56,19 @@ void cmd(uint8_t * cmd, uint8_t len)
         case 'd':
             cmd[len] = 0;
             display_msg((char*)cmd+1);
-            serial_sendFrames("dD");
+            serial_sendFrames(SERIAL_START_CONTROL, "dD");
         break;
         case 'p':
             ret = priceline_get();
             sprintf(buffer,"p=%d",ret);
-            serial_sendFrames(buffer);
+            serial_sendFrames(SERIAL_START_CONTROL, buffer);
         break;
         case 's':
             ret = priceline_serve(cmd[1]-'0');
             if(ret){
-                serial_sendFrames("sO");
+                serial_sendFrames(SERIAL_START_CONTROL, "sO");
             }else{
-                serial_sendFrames("sN");
+                serial_sendFrames(SERIAL_START_CONTROL, "sN");
             }
         break;
 
@@ -77,7 +77,7 @@ void cmd(uint8_t * cmd, uint8_t len)
 
 void matemat_served(void)
 {
-    serial_sendFrames("sD");
+    serial_sendFrames(SERIAL_START_CONTROL, "sD");
 }
 
 int main(void)

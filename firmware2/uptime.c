@@ -20,7 +20,7 @@ void uptime_tick(void)
         uptime.updated = 1;
         count = 100;
         uptime.uptime++;
-        debug('D', "uptime=%lu", uptime.uptime);
+        //debug('D', "uptime=%lu", uptime.uptime);
     }
 }
 

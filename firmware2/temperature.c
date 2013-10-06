@@ -82,5 +82,11 @@ void temperature_format(uint8_t index, char *buffer)
     if(DS18X20_format_from_decicelsius(temperature.temp[index], buffer, 16) != DS18X20_OK) {
         strcpy(buffer, "####.#");
     }
+    serial_putStart(SERIAL_START_TEMP);
+    serial_putsenc("temp");
+    serial_putcenc('0' + index);
+    serial_putsenc("=");
+    serial_putsenc(buffer);
+    serial_putStop();
 }
 

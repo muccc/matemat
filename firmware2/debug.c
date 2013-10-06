@@ -10,7 +10,7 @@ void debug(uint8_t level, char *fmt, ...)
     va_list myargs;
     va_start(myargs, fmt);
     vsprintf(buffer, fmt, myargs);
-    serial_putStartDebug();
+    serial_putStart(SERIAL_START_DEBUG);
     serial_putcenc(level);
     serial_putsenc(buffer);
     serial_putStop();

@@ -32,10 +32,10 @@ void serial_putenc(uint8_t * d, uint16_t n)
     }
 }
 
-inline void serial_putStart(void)
+inline void serial_putStart(uint8_t command)
 {
     uart_putc(SERIAL_ESCAPE);
-    uart_putc(SERIAL_START);
+    uart_putc(command);
 }
 
 inline void serial_putStartDebug(void)
@@ -50,16 +50,16 @@ inline void serial_putStop(void)
     uart_putc(SERIAL_END);
 }
 
-void serial_sendFrames(char * s)
+void serial_sendFrames(uint8_t command, char * s)
 {
-    serial_putStart();
+    serial_putStart(command);
     serial_putsenc(s);
     serial_putStop();
 }
 
-void serial_sendFramec(uint8_t s)
+void serial_sendFramec(uint8_t command, uint8_t s)
 {
-    serial_putStart();
+    serial_putStart(command);
     serial_putcenc(s);
     serial_putStop();
 }
@@ -93,7 +93,7 @@ unsigned int readline( void )
         escaped = 0;
     }else if(escaped){
         escaped = 0;
-        if(data == SERIAL_START){
+        if(data == SERIAL_START_CONTROL){
             fill = 0;
             return 0;
         }else if( data == SERIAL_END){
