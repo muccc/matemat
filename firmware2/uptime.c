@@ -20,9 +20,7 @@ void uptime_tick(void)
         uptime.updated = 1;
         count = 100;
         uptime.uptime++;
-        char buffer[64];
-        sprintf(buffer, "uptime=%lu", uptime.uptime);
-        debug(2,buffer);
+        debug('D', "uptime=%lu", uptime.uptime);
     }
 }
 

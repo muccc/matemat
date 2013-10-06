@@ -88,7 +88,7 @@ int main(void)
     uart_init( UART_BAUD_SELECT(UART_BAUDRATE,F_CPU));
     sei();
 
-    debug(1,"reset!");
+    debug('W',"reset");
     wdt_enable(WDTO_2S);
     lcd_init(LCD_DISP_ON);
     lcd_clrscr();
@@ -102,7 +102,7 @@ int main(void)
     priceline_init();
     display_init();
     display_tick(1);
-    debug(1,"init done"); 
+    debug('I',"init done"); 
     while(1){
         wdt_reset();
         gotcmd = serial_readline();

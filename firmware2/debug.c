@@ -1,15 +1,18 @@
-#include <stdint.h>
-
 #include "serial_handler.h"
-#include "config.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-void debug(uint8_t level, char * s)
+char buffer[128];
+
+void debug(uint8_t level, char *fmt, ...)
 {
-    if(DEBUGLEVEL >= level){
-        serial_putStart();
-        serial_putcenc('D');
-        serial_putcenc('0'+level);
-        serial_putsenc(s);
-        serial_putStop();
-    }
+    va_list myargs;
+    va_start(myargs, fmt);
+    vsprintf(buffer, fmt, myargs);
+    serial_putStartDebug();
+    serial_putcenc(level);
+    serial_putsenc(buffer);
+    serial_putStop();
+    va_end(myargs);
 }

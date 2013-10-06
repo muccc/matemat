@@ -95,14 +95,12 @@ void priceline_tick(void)
             }
         }
         count = 5;
-        /*char buffer[20];
-        if(PIN_HIGH(PRICELINE1)){
-            debug(8,"PL1 DOWN");
+        /*if(PIN_HIGH(PRICELINE1)){
+            debug('I',"PL1 DOWN");
         }else{
-            debug(8,"PL1 UP");
+            debug('I',"PL1 UP");
         }
-        sprintf(buffer,"pl=%d",priceline.pl);
-        debug(8,buffer);*/
+        debug('D', "pl=%d", priceline.pl);*/
     }
 }
 

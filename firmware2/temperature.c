@@ -28,7 +28,6 @@ void temperature_init(void)
     temperature.temp[TEMP_STOP] = TEMP_STOP_VAL;
     count = 0;
 	ow_reset();
-    uint8_t i;
     
     uint8_t diff = OW_SEARCH_FIRST;
     uint8_t id[OW_ROMCODE_SIZE];
@@ -37,25 +36,16 @@ void temperature_init(void)
         DS18X20_find_sensor(&diff, id);
         
         if( diff == OW_PRESENCE_ERR ) {
-            serial_putStart();
-            serial_putsenc("D1nosensor");
-            serial_putStop();
+            debug('E', "no sensor");
             break;
         }
 
         if( diff == OW_DATA_ERR ) {
-            serial_putStart();
-            serial_putsenc("D1buserror");
-            serial_putStop();
+            debug('E', "bus error");
             break;
         }
-
-        serial_putStart();
-        serial_putcenc('S');
-        for(i = 0; i < 8; i++) {
-            serial_putcenc(id[i]);
-        }
-        serial_putStop();
+        
+        debug('I', "sensor id %02x, %02x, %02x, %02x, %02x, %02x, %02x, %02x", id[0], id[1], id[2], id[3], id[4], id[5], id[6], id[7]);
     }
 
     count = 200;

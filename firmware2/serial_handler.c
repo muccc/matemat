@@ -38,6 +38,12 @@ inline void serial_putStart(void)
     uart_putc(SERIAL_START);
 }
 
+inline void serial_putStartDebug(void)
+{
+    uart_putc(SERIAL_ESCAPE);
+    uart_putc(SERIAL_START_DEBUG);
+}
+
 inline void serial_putStop(void)
 {
     uart_putc(SERIAL_ESCAPE);
